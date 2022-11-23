@@ -1,0 +1,2 @@
+from torrents.scrap_torrent import get_list_of_torrents, get_magnet
+import torrents.pynnmclub_edited

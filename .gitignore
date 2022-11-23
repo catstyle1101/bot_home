@@ -1,0 +1,8 @@
+env/
+.vscode/
+**/__pycache__
+tokens.py
+.idea/
+.env
+old_bot.py
+*.log
