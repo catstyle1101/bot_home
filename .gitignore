@@ -6,3 +6,4 @@ tokens.py
 .env
 old_bot.py
 *.log
+*.txt

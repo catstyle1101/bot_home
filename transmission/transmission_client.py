@@ -67,3 +67,4 @@ class TransmissionClient:
 if __name__ == '__main__':
     assert TransmissionClient.find_directory('01 СЕзон 02') == 'сериалы/'
     assert TransmissionClient.find_directory('Книга epub') == 'books/'
+    print(TransmissionClient().get_downloaded_torrents())
