@@ -3,8 +3,8 @@ import os
 import re
 
 from transmission_rpc import Client
-from transmission_rpc.error import TransmissionConnectError, TransmissionAuthError, TransmissionError, \
-    TransmissionTimeoutError
+from transmission_rpc.error import (TransmissionConnectError, TransmissionAuthError,
+    TransmissionError)
 
 
 class TransmissionClient:
@@ -16,10 +16,10 @@ class TransmissionClient:
         try:
             self.client = Client(host=HOST, port=9091, username=USER, password=PASSWORD)
         except TransmissionAuthError:
-            logging.warning(f"Transmission login failed")
+            logging.warning("Transmission login failed")
             raise TransmissionAuthError("Wrong Transmission login/password")
         except TransmissionConnectError:
-            logging.warning(f"Transmission client unavailable")
+            logging.warning("Transmission client unavailable")
             raise TransmissionConnectError("Transmission server :w"
                                            "unavailable")
 
@@ -41,8 +41,9 @@ class TransmissionClient:
         return ''
 
     def get_downloaded_torrents(self):
-        return [(torrent.id, torrent.name, str(round(torrent.size_when_done / 1073741824, 2)) + " GB")
-                for torrent in self.client.get_torrents()]
+        return [(torrent.id, torrent.name,
+                 str(round(torrent.size_when_done / 1073741824, 2)) + " GB")
+                 for torrent in self.client.get_torrents()]
 
     def get_torrent_name(self, number: str):
         return self.client.get_torrent(int(number)).name
@@ -56,7 +57,10 @@ class TransmissionClient:
     def add_torrent(self, link: str, name: str|None = None):
         directory = self.find_directory(name)
         try:
-            self.client.add_torrent(link, download_dir='/mnt/transmission/downloads/' + directory)
+            self.client.add_torrent(
+                link,
+                download_dir='/mnt/transmission/downloads/' + directory
+            )
         except TransmissionError:
             logging.warning("Download failure, can't add magnet link")
             return "Произошла ошибка"
