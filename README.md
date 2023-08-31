@@ -1,8 +1,21 @@
 Домашний бот для контроля закаченных торрентов и их добавления.
 
+
 <details>
 
 <summary>Запуск в докер контейнере</summary>
+
+
+## Установка докер
+
+```
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo bash get-docker.sh
+sudo usermod -aG docker $(whoami)
+sudo reboot
+```
+
+## Запуск контейнера
 
 ```
 git clone git@github.com:catstyle1101/bot_home.git
