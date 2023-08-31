@@ -37,7 +37,6 @@ async def on_startup(dp):
 
 
 scrapping.register_handlers_scrapping(dp)
-magnet_download.register_handlers_magnet_download(dp)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
