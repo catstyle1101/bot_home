@@ -8,8 +8,8 @@ import aioschedule as schedule
 
 from config import ADMINS
 from create_bot import bot, dp
-from handlers import scrapping, magnet_download
 from homework_checker import scrap_homework
+import handlers
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,7 +36,6 @@ async def on_startup(dp):
     asyncio.create_task(scheduler())
 
 
-scrapping.register_handlers_scrapping(dp)
 
 if __name__ == '__main__':
     executor.start_polling(dp, skip_updates=True, on_startup=on_startup)
