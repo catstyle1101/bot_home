@@ -52,7 +52,7 @@ jobs:
       - build_and_push_bot_to_DockerHub
     steps:
       - name: executing remote ssh commands to deploy
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.SERVER_USER }}
