@@ -18,7 +18,7 @@ jobs:
         script: sudo rm -rf /home/${{ secrets.HOST_USER }}/bot && mkdir -p /home/${{ secrets.HOST_USER }}/bot
 
     - name: Copy compose file
-      uses: appleboy/scp-action@v0.1.4
+      uses: appleboy/scp-action@v1.0.0
       with:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.HOST_USER}}
@@ -55,10 +55,10 @@ jobs:
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.HOST }}
-          username: ${{ secrets.SERVER_USER }}
+          username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            cd /home/${{ secrets.SERVER_USER }}/bot
+            cd /home/${{ secrets.HOST_USER }}/bot
             touch .env
             echo TELEGRAM_TOKEN_MANHATTAN=${{ secrets.TELEGRAM_TOKEN_MANHATTAN }} >> .env
             sudo docker compose down
