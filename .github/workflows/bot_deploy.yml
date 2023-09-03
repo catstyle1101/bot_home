@@ -25,3 +25,43 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         source: "docker-compose.yml"
         target: /home/${{ secrets.HOST_USER }}/bot/
+  build_and_push_bot_to_DockerHub:
+      name: Push bot image and pushing it to DockerHub
+      runs-on: ubuntu-latest
+      needs: copy_compose_on_server
+      steps:
+        - name: Check out the repo
+          uses: actions/checkout@v2
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v1
+        - name: Login to Docker
+          uses: docker/login-action@v1
+          with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+        - name: Push to Docker Hub
+          uses: docker/build-push-action@v2
+          with:
+            push: true
+            tags: ${{ secrets.DOCKER_USERNAME }}/bot_home
+            context: .
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - copy_compose_on_server
+      - build_and_push_bot_to_DockerHub
+    steps:
+      - name: executing remote ssh commands to deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.SERVER_USER }}/bot
+            touch .env
+            echo TELEGRAM_TOKEN_MANHATTAN=${{ secrets.TELEGRAM_TOKEN_MANHATTAN }} >> .env
+            sudo docker compose down
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/bot_home
+            sudo docker compose up -d
+            sudo docker image prune -f

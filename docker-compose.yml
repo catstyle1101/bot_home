@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   bot:
-    build: .
+    image: catstyle1101/bot_home:latest
     restart: always
     env_file:
       - .env
