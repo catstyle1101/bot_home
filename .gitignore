@@ -7,3 +7,4 @@ tokens.py
 old_bot.py
 *.log
 *.txt
+bot_env/
