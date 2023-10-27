@@ -4,7 +4,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from create_bot import dp
-from config import ALLOWED_USERS
+from config import settings
 from messages import format_torrent
 from torrent_api.fetch import make_magnet_link, scrap_torrents
 from transmission.transmission_client import TransmissionClient
@@ -76,7 +76,7 @@ async def download_torrent(message: types.Message):
     torrent = await make_magnet_link(torrents.get(magnet_key))
 
     if torrent.magnet_link.startswith('magnet'):
-        if message.from_user.id in ALLOWED_USERS:
+        if message.from_user.id in settings.ALLOWED_USERS:
             client = TransmissionClient()
             client.add_torrent(torrent.magnet_link)
             await message.answer('Закачка добавлена')

@@ -2,7 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher.filters import Text
-from config import ALLOWED_USERS
+from config import settings
 from create_bot import dp, bot
 from keyboards import inline_del_torrent_kb, inline_start_menu_kb
 from transmission.transmission_client import TransmissionClient
@@ -22,7 +22,7 @@ async def command_start(message: types.Message):
     """
     add = (
         'P.S. Ты - моя любовь' + random_heart()
-        if message.from_user.id == 454690652 else ''
+        if message.from_user.id == settings.SPECIAL_USER else ''
     )
     await message.answer(
         'Привет! Что будем делать?\n' +
@@ -43,7 +43,7 @@ async def command_downloaded_torrents(message: types.CallbackQuery):
     for torrent_number, torrent_name, torrent_size in list_of_torrents:
         torrent_name = ' '.join(torrent_name.split('.'))
         answer += answer_template.format(torrent_name, torrent_size)
-        if message.from_user.id in ALLOWED_USERS:
+        if message.from_user.id in settings.ALLOWED_USERS:
             answer += answer_delete_template.format(torrent_number)
         answer += "\n\n"
     if len(answer) > 4096:
@@ -69,7 +69,7 @@ async def del_call(message: types.Message):
 
     name = transmission_client.get_torrent_name(torrent_id)
     answer = f'Удалить позицию №{torrent_id} {name}?'
-    if message.from_user.id in ALLOWED_USERS:
+    if message.from_user.id in settings.ALLOWED_USERS:
         await message.answer(
             answer, reply_markup=inline_del_torrent_kb(torrent_id)
         )

@@ -4,17 +4,10 @@ import sys
 
 from aiogram.utils import executor
 
-from config import ADMINS
+from config import settings
 from create_bot import bot, dp
-import handlers
+import handlers # noqa
 
-logging.basicConfig(
-    level=logging.INFO,
-    filename="bot_log.log",
-    filemode="a",
-    format="%(asctime)s %(levelname)s %(message)s",
-    encoding='utf-8'
-)
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logging.getLogger().setLevel(logging.INFO)
 
@@ -29,7 +22,7 @@ async def on_startup(dp):
     Returns:
         None
     """
-    for user in ADMINS:
+    for user in settings.ALLOWED_USERS:
         await bot.send_message(user, 'Bot is online!')
     logging.info('Bot is online')
 

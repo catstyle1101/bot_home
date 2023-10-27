@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from config import ALLOWED_USERS
+from config import settings
 
 def inline_del_torrent_kb(torrent : int):
     """
@@ -51,7 +51,7 @@ def inline_start_menu_kb(user_id: int):
     keyboard = InlineKeyboardMarkup()
     keyboard.row(InlineKeyboardButton(
         text='🔎  Найти', callback_data='menu_find'))
-    if user_id in ALLOWED_USERS:
+    if user_id in settings.ALLOWED_USERS:
         keyboard.row(
             InlineKeyboardButton(
                 text='🧲 Ссылка', callback_data='menu_downloadmagnet'),

@@ -62,6 +62,7 @@ jobs:
             cd /home/${{ secrets.HOST_USER }}/bot
             touch .env
             echo TELEGRAM_TOKEN_MANHATTAN=${{ secrets.TELEGRAM_TOKEN_MANHATTAN }} >> .env
+            echo ADMINS=${{ secrets.ADMINS }} >> .env
             sudo docker compose down
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/bot_home
             sudo docker compose up -d

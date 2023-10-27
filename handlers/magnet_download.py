@@ -6,7 +6,7 @@ from aiogram.dispatcher.filters import Text
 from aiogram.dispatcher.filters.state import State, StatesGroup
 
 from create_bot import dp
-from config import ALLOWED_USERS
+from config import settings
 from keyboards import inline_start_menu_kb
 from transmission.transmission_client import TransmissionClient
 
@@ -45,7 +45,7 @@ async def add_link_to_downloads(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['magnet'] = message.text
 
-    if message.from_user.id not in ALLOWED_USERS:
+    if message.from_user.id not in settings.ALLOWED_USERS:
         await message.reply('Это только для жителей квартиры)')
         await message.delete()
         await state.finish()
