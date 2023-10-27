@@ -3,8 +3,7 @@ import os
 import re
 
 from transmission_rpc import Client
-from transmission_rpc.error import (TransmissionConnectError, TransmissionAuthError,
-    TransmissionError)
+from transmission_rpc.error import TransmissionError
 
 
 class TransmissionClient:
@@ -31,7 +30,8 @@ class TransmissionClient:
         HOST = '192.168.1.1'
         #HOST = 'catstyle1101.ddns.net'
         try:
-            self.client = Client(host=HOST, port=9091, username=USER, password=PASSWORD)
+            self.client = Client(
+                host=HOST, port=9091, username=USER, password=PASSWORD)
         except TransmissionError as e:
             logging.warning(f"Transmission error: {str(e)}")
             raise TransmissionError(f"Transmission error: {str(e)}")
@@ -45,7 +45,8 @@ class TransmissionClient:
             name (str): The name of the directory.
 
         Returns:
-            str: The corresponding directory path. If no directory is found, an empty string is returned.
+            str: The corresponding directory path. If no directory is
+                found, an empty string is returned.
         """
         if not name:
             return ''
@@ -67,7 +68,8 @@ class TransmissionClient:
         Retrieves a list of downloaded torrents from the client.
 
         Returns:
-            result (list): A list of tuples containing the torrent ID, name, and size in GB.
+            result (list): A list of tuples containing the torrent
+                ID, name, and size in GB.
         """
         torrents = self.client.get_torrents()
         result = [(torrent.id, torrent.name,

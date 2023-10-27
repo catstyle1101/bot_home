@@ -28,7 +28,8 @@ def inline_add_torrent_kb():
     a torrent.
 
     Returns:
-        InlineKeyboardMarkup: The inline keyboard markup with two buttons for adding a torrent.
+        InlineKeyboardMarkup: The inline keyboard markup with two buttons
+            for adding a torrent.
     """
     kb = InlineKeyboardMarkup()
     kb.row(
@@ -48,15 +49,22 @@ def inline_start_menu_kb(user_id: int):
         InlineKeyboardMarkup: The generated inline keyboard markup.
     """
     keyboard = InlineKeyboardMarkup()
-    keyboard.row(InlineKeyboardButton(text='🔎  Найти', callback_data='menu_find'))
+    keyboard.row(InlineKeyboardButton(
+        text='🔎  Найти', callback_data='menu_find'))
     if user_id in ALLOWED_USERS:
         keyboard.row(
-            InlineKeyboardButton(text='🧲 Ссылка', callback_data='menu_downloadmagnet'),
-            InlineKeyboardButton(text='📂 Скачанные торренты', callback_data='menu_list')
+            InlineKeyboardButton(
+                text='🧲 Ссылка', callback_data='menu_downloadmagnet'),
+            InlineKeyboardButton(
+                text='📂 Скачанные торренты', callback_data='menu_list'),
         )
     return keyboard
 
-    # на данный момент библиотека не поддерживает наш пылесос, поэтому ждем обновлений
+    # на данный момент библиотека не поддерживает наш пылесос,
+    # поэтому ждем обновлений
     # https://github.com/rytilahti/python-miio/issues/1114
-    # вот ссылка на issues (Add Xiaomi Vacuum 1C dreame.vacuum.mc1808 to Vacuum_Miio Integration #1182)
-    # .row(InlineKeyboardButton(text='🧹 ▶️ ', callback_data='menu_vacuum_start'),InlineKeyboardButton(text='🧹⏹️ ', callback_data='menu_vacuum_stop'))
+    # вот ссылка на issues (Add Xiaomi Vacuum 1C dreame.vacuum.mc1808 to
+    # Vacuum_Miio Integration #1182)
+    # .row(InlineKeyboardButton(
+    # text='🧹 ▶️ ', callback_data='menu_vacuum_start'),InlineKeyboardButton(
+    # text='🧹⏹️ ', callback_data='menu_vacuum_stop'))
