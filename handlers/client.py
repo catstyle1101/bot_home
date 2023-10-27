@@ -2,7 +2,7 @@ import logging
 
 from aiogram import types
 from aiogram.dispatcher.filters import Text
-from config import ADMINS, MODERATORS
+from config import ALLOWED_USERS
 from create_bot import dp, bot
 from keyboards import inline_del_torrent_kb, inline_start_menu_kb
 from transmission.transmission_client import TransmissionClient
@@ -11,40 +11,41 @@ from digits_emoji import random_heart
 
 @dp.message_handler(commands=['start', 'help'])
 async def command_start(message: types.Message):
-    add = ''
-    if message.from_user.id == 454690652:
-        add += 'P.S. Ты -  моя любовь' + random_heart()
-    try:
-        await message.answer(
-            'Привет! Что будем делать?\n' +
-            add, reply_markup=inline_start_menu_kb()
-        )
-    except Exception as e:
-        logging.error(e)
-        await message.reply('Напиши боту в ЛС')
+    """
+    Handles the 'start' and 'help' commands.
+
+    Args:
+    - message (types.Message): The message object received.
+
+    Returns:
+    - None
+    """
+    add = (
+        'P.S. Ты - моя любовь' + random_heart()
+        if message.from_user.id == 454690652 else ''
+    )
+    await message.answer(
+        'Привет! Что будем делать?\n' +
+        add, reply_markup=inline_start_menu_kb(message.from_user.id)
+    )
 
 
 @dp.callback_query_handler(Text(equals='menu_list'))
 async def command_downloaded_torrents(message: types.CallbackQuery):
     """
-    Бот высылает список скачанных торрентов,
-    с кнопкой удаления для админов.
+    Bot sends a list of downloaded torrents with a delete button for admins.
     """
     transmission_client = TransmissionClient()
     list_of_torrents = transmission_client.get_downloaded_torrents()
-    allowed_users = ADMINS + MODERATORS
-    answer_template = "🟣\t{}\t{}\t"
-    answer_delete_template = "🗑/delete_{}\n\n"
-    answer = str()
-    for torrent in list_of_torrents:
-        torrent_name = ' '.join(torrent[1].split('.'))
-        torrent_size = torrent[2]
-        torrent_number = torrent[0]
+    answer_template = '🟣\t{}\t{}\t'
+    answer_delete_template = '🗑/delete_{}'
+    answer = ''
+    for torrent_number, torrent_name, torrent_size in list_of_torrents:
+        torrent_name = ' '.join(torrent_name.split('.'))
         answer += answer_template.format(torrent_name, torrent_size)
-        if message.from_user.id in allowed_users:
+        if message.from_user.id in ALLOWED_USERS:
             answer += answer_delete_template.format(torrent_number)
-        else:
-            answer += "\n\n"
+        answer += "\n\n"
     if len(answer) > 4096:
         for x in range(0, len(answer), 4096):
             await bot.send_message(message.from_user.id, answer[x:x+4096])
@@ -54,15 +55,23 @@ async def command_downloaded_torrents(message: types.CallbackQuery):
 
 @dp.message_handler(Text(startswith='/delete_'))
 async def del_call(message: types.Message):
-    """формирую запрос на удаление определенного торрента"""
-    allowed_users = ADMINS + MODERATORS
+    """
+    Handles the deletion of a torrent.
+
+    Args:
+    - message (types.Message): The message object containing the command.
+
+    Returns:
+    - None
+    """
     transmission_client = TransmissionClient()
-    res = message.text.split('_')
-    name = transmission_client.get_torrent_name(res[1])
-    answer = f'Удалить позицию №{res[1]} {name}?'
-    if message.from_user.id in allowed_users:
+    torrent_id = message.text.split('_')[1]
+
+    name = transmission_client.get_torrent_name(torrent_id)
+    answer = f'Удалить позицию №{torrent_id} {name}?'
+    if message.from_user.id in ALLOWED_USERS:
         await message.answer(
-            answer, reply_markup=inline_del_torrent_kb(res[1])
+            answer, reply_markup=inline_del_torrent_kb(torrent_id)
         )
         await message.delete()
     else:
@@ -71,14 +80,20 @@ async def del_call(message: types.Message):
 
 @dp.callback_query_handler(Text(startswith='del_'))
 async def delete_torrent(callback: types.CallbackQuery):
-    """удаляем торрент, если ответ в инлайн кнопке ДА"""
+    """
+    Handles the callback query for deleting a torrent.
+
+    Args:
+    - callback (types.CallbackQuery): The callback query object.
+
+    Returns:
+    - None
+    """
     transmission_client = TransmissionClient()
     res = callback.data.split('_')
     if res[1] == 'yes':
         await callback.answer(
-            transmission_client.del_torrent(res[2]), show_alert=True
-        )
-        await callback.message.delete()
+            transmission_client.del_torrent(res[2]), show_alert=True)
     else:
         await callback.answer('Ок, ничего не удаляю')
-        await callback.message.delete()
+    await callback.message.delete()
