@@ -6,6 +6,7 @@ from aiogram.utils import executor
 
 from config import ADMINS
 from create_bot import bot, dp
+import handlers
 
 logging.basicConfig(
     level=logging.INFO,
