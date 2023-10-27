@@ -15,8 +15,10 @@ async def command_start(message: types.Message):
     if message.from_user.id == 454690652:
         add += 'P.S. Ты -  моя любовь' + random_heart()
     try:
-        await message.answer('Привет! Что будем делать?\n'
-                             + add, reply_markup=inline_start_menu_kb())
+        await message.answer(
+            'Привет! Что будем делать?\n' +
+            add, reply_markup=inline_start_menu_kb()
+        )
     except Exception as e:
         logging.error(e)
         await message.reply('Напиши боту в ЛС')

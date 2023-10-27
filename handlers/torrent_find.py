@@ -24,17 +24,12 @@ async def find_title(callback: types.CallbackQuery):
 async def show_torrents(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['title'] = message.text
-    allowed_users = ADMINS + MODERATORS
-    if message.from_user.id in allowed_users:
         global torrents
         torrents = await scrap_torrents(message.text)
         answer = ''
         for torrent in torrents.values():
             answer += format_torrent(torrent)
         await message.reply(answer)
-
-    else:
-        await message.reply('Это только для жителей квартиры)')
     await state.finish()
 
 
@@ -44,11 +39,13 @@ async def download_torrent(message: types.Message):
         await message.answer('Сделай поиск заново, ссылки устарели')
         return
     magnet_key = message.text.split('_')[1]
-    client = TransmissionClient()
+    allowed_users = ADMINS + MODERATORS
     torrent = await make_magnet_link(torrents.get(magnet_key))
     if torrent.magnet_link.startswith('magnet'):
-        client.add_torrent(torrent.magnet_link)
-        await message.answer('Закачка добавлена')
+        if message.from_user.id in allowed_users:
+            client = TransmissionClient()
+            client.add_torrent(torrent.magnet_link)
+            await message.answer('Закачка добавлена')
         await message.answer(
             format_torrent(torrents.get(magnet_key), short=True))
         await message.answer(torrent.magnet_link)

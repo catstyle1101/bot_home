@@ -8,7 +8,6 @@ import aioschedule as schedule
 
 from config import ADMINS
 from create_bot import bot, dp
-from homework_checker import scrap_homework
 import handlers
 
 logging.basicConfig(
@@ -22,18 +21,10 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 logging.getLogger().setLevel(logging.INFO)
 
 
-async def scheduler():
-    schedule.every(10).minutes.do(scrap_homework)
-    while True:
-        await schedule.run_pending()
-        await asyncio.sleep(0.1)
-
-
 async def on_startup(dp):
     for user in ADMINS:
         await bot.send_message(user, 'Bot is online!')
     logging.info('Bot is online')
-    asyncio.create_task(scheduler())
 
 
 

@@ -1,5 +1,3 @@
 ADMINS = [335773828, ]
 MODERATORS = [454690652, ]
-PRACTICUM_TOKENS = ((335773828, 'y0_AgAAAAAR9aPoAAYckQAAAADXLXKXIfl-7XPiQgaseji_XQ8aoI9Agpk'),
-                    (454690652, 'y0_AgAAAAA-ccRaAAYckQAAAADXTbVjJ4EAb66vRpaMEMu1BfhmbuaD5Dw'),
-                    )
+# ADMINS = []
