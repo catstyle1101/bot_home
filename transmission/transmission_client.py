@@ -72,6 +72,7 @@ class TransmissionClient:
                 ID, name, and size in GB.
         """
         torrents = self.client.get_torrents()
+        torrents.sort(key=lambda x: x.name)
         result = [(torrent.id, torrent.name,
                 f"{round(torrent.size_when_done / 1073741824, 2)} GB")
                 for torrent in torrents]
