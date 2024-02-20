@@ -1,0 +1,4 @@
+{% for torrent in torrents %}
+{% if is_short %}{{ torrent.title }}{% else %}<b>{{ torrent.title }}</b>
+size: {{ torrent.size }} S/L({{ torrent.seeders }}/{{ torrent.leechers }}; downloads: {{ torrent.downloads }}
+/link_{{ torrent.magnet_key }} ..{% endif %}{% endfor %}

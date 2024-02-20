@@ -43,7 +43,7 @@ jobs:
           uses: docker/build-push-action@v2
           with:
             push: true
-            tags: ${{ secrets.DOCKER_USERNAME }}/bot_home
+            tags: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.BOT_CONTAINER_NAME}}
             platforms: linux/amd64,linux/arm64
             context: .
   deploy:
@@ -61,9 +61,17 @@ jobs:
           script: |
             cd /home/${{ secrets.HOST_USER }}/bot
             touch .env
-            echo TELEGRAM_TOKEN_MANHATTAN=${{ secrets.TELEGRAM_TOKEN_MANHATTAN }} >> .env
+            echo BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_MANHATTAN }} >> .env
             echo ADMINS=${{ secrets.ADMINS }} >> .env
+            echo DOMAIN=${{ secrets.DOMAIN }} >> .env
+            echo NGROK_TOKEN=${{ secrets.NGROK_TOKEN }} >> .env
+            echo WEBHOOK_SECRET=${{ secrets.WEBHOOK_SECRET }} >> .env
+            echo TRANSMISSION_LOGIN=${{ secrets.TRANSMISSION_LOGIN }} >> .env
+            echo TRANSMISSION_PASSWORD=${{ secrets.TRANSMISSION_PASSWORD }} >> .env
+            echo TRANSMISSION_HOST=${{ secrets.TRANSMISSION_HOST }} >> .env
+            echo DOCKERHUB_USER=${{ secrets.DOCKER_USERNAME }} >> .env
+            echo BOT_CONTAINER_NAME=${{ secrets.BOT_CONTAINER_NAME }} >> .env
             sudo docker compose down
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/bot_home
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.BOT_CONTAINER_NAME }}
             sudo docker compose up -d
             sudo docker image prune -f

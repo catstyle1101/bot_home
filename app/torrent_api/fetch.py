@@ -19,7 +19,7 @@ def session_maker():
 async def fetch_url(
         url: str,
         query: str,
-        trackers: list[str] = ["nnmclub"],
+        trackers: list[str] = ["rutracker"],
         order_by: str = 's',
         filter_by_size: str = '',
         limit: int = 20,

@@ -4,7 +4,10 @@ env/
 tokens.py
 .idea/
 .env
+.venv
 old_bot.py
 *.log
 *.txt
 bot_env/
+certs/
+*.jsonl

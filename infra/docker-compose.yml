@@ -1,4 +1,5 @@
 version: '3.7'
+
 services:
   ngrok:
     image: ngrok/ngrok:latest
@@ -10,10 +11,17 @@ services:
       - "--domain=${DOMAIN}"
     ports:
       - "4040:4040"
-    env_file:
-      - .env
+
   bot:
-    image: ${DOCKERHUB_USER}/${BOT_CONTAINER_NAME}:latest
+    build:
+      context: ../
     restart: on-failure
+    stop_signal: SIGINT
+    depends_on:
+      - ngrok
+    ports:
+      - "8080:8080"
     env_file:
       - .env
+    volumes:
+      - ../app/:/app/bot/
