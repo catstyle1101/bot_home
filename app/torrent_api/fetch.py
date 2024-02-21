@@ -1,6 +1,7 @@
 import aiohttp
 import json
 
+from config import settings
 from torrent_api.data_formatter import format_data, TorrentFormatter
 
 
@@ -18,11 +19,12 @@ def session_maker():
 
 async def fetch_url(
         url: str,
+        *,
         query: str,
-        trackers: list[str] = ["rutracker"],
+        trackers: list[str] = settings.FIND_TORRENTS_TRACKERS,
         order_by: str = 's',
         filter_by_size: str = '',
-        limit: int = 20,
+        limit: int = settings.FIND_TORRENTS_LIMIT,
         offset: int = 0,
         full_match: bool = True,
         token: str = ''
@@ -67,7 +69,7 @@ async def fetch_url(
             return await response.json()
 
 
-async def scrap_torrents(query: str) -> dict[str, TorrentFormatter]:
+async def scrap_torrents(**kwargs) -> dict[str, TorrentFormatter]:
     """
     An asynchronous function that scrapes torrents based on a given query.
 
@@ -78,7 +80,7 @@ async def scrap_torrents(query: str) -> dict[str, TorrentFormatter]:
     - dict[str, TorrentFormatter]: A dictionary containing the magnet
         keys and their corresponding formatted torrent data.
     """
-    raw_data = await fetch_url('/search', query=query)
+    raw_data = await fetch_url('/search', **kwargs)
     data = {i['magnet_key']: format_data(i) for i in raw_data['data']}
     return data
 

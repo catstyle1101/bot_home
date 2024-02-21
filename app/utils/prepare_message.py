@@ -17,6 +17,7 @@ def prepare_message(message: str, delimiter: str) -> list[str]:
             if len_reply_message + len(line) > 4096:
                 result.append(reply_message.getvalue())
                 reply_message = StringIO()
+                len_reply_message = 0
             else:
                 reply_message.write(line)
                 len_reply_message += len(line)

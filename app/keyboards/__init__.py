@@ -7,6 +7,7 @@ from .torrent_kb import (
     TorrentsListKeyboardCallbackData,
     DeleteActionEnum,
 )
+from .torrent_find_kb import torrent_find_kb, NavigateFindTorrentsCb
 
 __all__ = (
     start_menu_kb,
@@ -18,4 +19,6 @@ __all__ = (
     TorrentDelConfirmCallbackData,
     NavigateTorrentsListCallbackData,
     TorrentsListKeyboardCallbackData,
+    torrent_find_kb,
+    NavigateFindTorrentsCb
 )

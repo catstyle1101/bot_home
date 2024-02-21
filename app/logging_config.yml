@@ -21,10 +21,10 @@ handlers:
     class: logging.StreamHandler
     formatter: simple
     stream: ext://sys.stdout
-    level: INFO
+    level: DEBUG
   file:
     class: logging.handlers.RotatingFileHandler
-    level: DEBUG
+    level: ERROR
     formatter: json
     filename: /var/log/bot_log.jsonl
     maxBytes: 1000000

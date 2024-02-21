@@ -30,7 +30,7 @@ class NavigateTorrentsListCallbackData(CallbackData, prefix="navigate_torrents")
 def generate_torrent_keyboard(
     torrents: list[Torrent],
     page: int = 0,
-    page_size: int = settings.PAGE_SIZE,
+    page_size: int = settings.SHOW_TORRENTS_PAGE_SIZE,
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     count_pages = len(torrents) // page_size + 1

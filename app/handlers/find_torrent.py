@@ -1,12 +1,15 @@
+import logging
 from datetime import datetime
 
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import CallbackQuery, Message
 
 from config import settings
 from enums import MessageType
-from keyboards import StartMenuCallbackData, Action
+from keyboards import StartMenuCallbackData, Action, torrent_find_kb, \
+    NavigateFindTorrentsCb
 from torrent_api.fetch import make_magnet_link, scrap_torrents
 from transmission_client import TransmissionClient
 from utils import render_message, prepare_message
@@ -61,10 +64,43 @@ async def show_torrents(message: types.Message, state: FSMContext):
     """
     await state.update_data(title=message.text)
 
-    torrents = await scrap_torrents(message.text)
-    TorrentsCache.torrents = torrents
-    TorrentsCache.timestamp = datetime.now().timestamp() + 60 * 10
+    torrents = await scrap_torrents(query=message.text)
+    if torrents:
+        TorrentsCache.torrents = torrents
+        TorrentsCache.timestamp = datetime.now().timestamp() + 60 * 10
+        answer = render_message(
+            MessageType.format_find_torrent,
+            torrents=[i for i in torrents.values()],
+            is_short=False,
+        )
+        answer_messages = prepare_message(message=answer, delimiter=" ..")
+        for idx, reply_message in enumerate(answer_messages, 1):
+            if idx == len(answer_messages):
+                try:
+                    await message.reply(
+                        reply_message,
+                        reply_markup=torrent_find_kb(
+                            query=message.text,
+                        ),
+                    )
+                except ValueError as e:
+                    logging.error(e)
+                    await message.reply(reply_message)
+            else:
+                await message.reply(reply_message)
+    else:
+        answer = render_message(MessageType.nothing_found)
+        await message.reply(text=answer)
+    await state.clear()
 
+
+@router.callback_query(NavigateFindTorrentsCb.filter())
+async def navigate_find_torrents(callback_query: CallbackQuery):
+    data = NavigateFindTorrentsCb.unpack(callback_query.data)
+    await callback_query.answer()
+    torrents = await scrap_torrents(query=data.query, offset=data.offset)
+    TorrentsCache.torrents = torrents
+    TorrentsCache.timestamp = datetime.now().timestamp() * 60 * 10
     if torrents:
         answer = render_message(
             MessageType.format_find_torrent,
@@ -72,12 +108,13 @@ async def show_torrents(message: types.Message, state: FSMContext):
             is_short=False,
         )
         answer_messages = prepare_message(message=answer, delimiter=" ..")
-        for reply_message in answer_messages:
-            await message.reply(reply_message)
-    else:
-        answer = render_message(MessageType.nothing_found)
-        await message.reply(text=answer)
-    await state.clear()
+        await callback_query.message.edit_text(text=answer_messages[0])
+        await callback_query.message.edit_reply_markup(
+            reply_markup=torrent_find_kb(
+                query=data.query,
+                current_offset=data.offset,
+            ),
+        )
 
 
 @router.message(F.text.startswith("/link_"))
