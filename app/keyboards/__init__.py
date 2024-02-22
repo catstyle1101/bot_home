@@ -8,6 +8,7 @@ from .torrent_kb import (
     DeleteActionEnum,
 )
 from .torrent_find_kb import torrent_find_kb, NavigateFindTorrentsCb
+from .torrent_settings_kb import torrent_settings_kb, TrackerCb, TrackerListAction
 
 __all__ = (
     start_menu_kb,
@@ -20,5 +21,8 @@ __all__ = (
     NavigateTorrentsListCallbackData,
     TorrentsListKeyboardCallbackData,
     torrent_find_kb,
-    NavigateFindTorrentsCb
+    NavigateFindTorrentsCb,
+    torrent_settings_kb,
+    TrackerCb,
+    TrackerListAction
 )

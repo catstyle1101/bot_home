@@ -85,6 +85,15 @@ async def scrap_torrents(**kwargs) -> dict[str, TorrentFormatter]:
     return data
 
 
+async def list_of_trackers(**kwargs) -> list[str]:
+    trackers = []
+    async with session_maker() as session:
+        async with session.get('/trackers', ssl=False) as response:
+            trackers = (await response.json()).get("data")
+    return trackers
+
+
+
 async def make_magnet_link(torrent: TorrentFormatter):
     """
     Asynchronously creates a magnet link for a given torrent.

@@ -21,26 +21,7 @@ class Settings(BaseSettings):
     WEBHOOK_SSL_PRIV: str = "./certs/YOURPRIVATE.key"
     SHOW_TORRENTS_PAGE_SIZE: int = 10
     FIND_TORRENTS_LIMIT: int = 15
-    FIND_TORRENTS_TRACKERS: list[
-        Literal[
-            "rutracker",
-            "booktracker",
-            "rutor",
-            "rustorka",
-            "eztv",
-            "piratebay",
-            "nnmclub",
-            "tapochek",
-            "greentea",
-            "nyaa",
-            "l337x",
-            "tby",
-            "kinozal",
-            "pmi2p",
-            "rarbg",
-            "newteamorg",
-        ]
-    ] = ["rutracker"]
+    FIND_TORRENTS_TRACKERS: list[str] = ["rutracker"]
 
     def model_post_init(self, __context: Any) -> None:
         if isinstance(self.ADMINS, str):

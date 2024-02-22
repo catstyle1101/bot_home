@@ -1,10 +1,8 @@
 import asyncio
-import logging
 
 from aiogram import Router, types
 from aiogram.enums import ChatAction
 
-from handlers.callback_query_handlers import router
 
 router = Router()
 

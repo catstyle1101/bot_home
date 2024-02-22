@@ -3,6 +3,8 @@ from enum import StrEnum
 
 class MessageType(StrEnum):
     start_menu = "messages/start_menu.j2"
+    help_command = "messages/help_command.j2"
+    torrent_settings = "messages/torrent_settings.j2"
     delete_torrent = "messages/delete_torrent.j2"
     confirm_delete_message = "messages/confirm_delete_message.j2"
     download_magnet = "messages/download_magnet.j2"
