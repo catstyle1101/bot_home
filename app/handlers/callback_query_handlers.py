@@ -12,7 +12,8 @@ from keyboards import (
     generate_del_torrent_kb,
     NavigateTorrentsListCallbackData,
     TorrentDelConfirmCallbackData,
-    TorrentsListKeyboardCallbackData, DeleteActionEnum,
+    TorrentsListKeyboardCallbackData,
+    DeleteActionEnum,
 )
 from transmission_client import TransmissionClient
 from utils import render_message
@@ -109,8 +110,8 @@ async def delete_torrent_page(
     TorrentDelConfirmCallbackData.filter(F.action == DeleteActionEnum.delete)
 )
 async def delete_torrent(
-        callback_query: types.CallbackQuery,
-        callback_data: TorrentDelConfirmCallbackData,
+    callback_query: types.CallbackQuery,
+    callback_data: TorrentDelConfirmCallbackData,
 ):
     transmission = TransmissionClient()
     torrent_name = transmission.get_torrent_name(callback_data.torrent_id)
@@ -127,15 +128,16 @@ async def delete_torrent(
     cache.set_torrents(torrents)
     await callback_query.message.edit_text(text=message)
     await callback_query.message.edit_reply_markup(
-        reply_markup=generate_torrent_keyboard(torrents=torrents))
+        reply_markup=generate_torrent_keyboard(torrents=torrents)
+    )
 
 
 @router.callback_query(
     TorrentDelConfirmCallbackData.filter(F.action == DeleteActionEnum.no_delete)
 )
 async def no_delete_torrent(
-        callback_query: types.CallbackQuery,
-        callback_data: TorrentDelConfirmCallbackData,
+    callback_query: types.CallbackQuery,
+    callback_data: TorrentDelConfirmCallbackData,
 ):
     await callback_query.answer()
     transmission = TransmissionClient()
@@ -153,4 +155,5 @@ async def no_delete_torrent(
         torrents = transmission.get_downloaded_torrents()
         cache.set_torrents(torrents)
     await callback_query.message.edit_reply_markup(
-        reply_markup=generate_torrent_keyboard(torrents=torrents))
+        reply_markup=generate_torrent_keyboard(torrents=torrents)
+    )

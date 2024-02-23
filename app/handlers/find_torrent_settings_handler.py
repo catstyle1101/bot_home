@@ -37,6 +37,7 @@ class TrackersCache:
         self._expires_at = datetime.now().timestamp() + 24 * HOURS
         self._trackers = trackers
 
+
 @router.message(Command("torrent_settings"))
 async def torrent_settings_handler(message: types.Message):
     answer = render_message(MessageType.torrent_settings)
@@ -48,11 +49,11 @@ async def torrent_settings_handler(message: types.Message):
     await message.reply(answer, reply_markup=torrent_settings_kb(trackers=trackers))
 
 
-
 @router.callback_query(TrackerCb.filter(F.action == TrackerListAction.add))
-async def add_tracker(callback_query: types.CallbackQuery):
-    data = TrackerCb.unpack(callback_query.data)
-    settings.FIND_TORRENTS_TRACKERS.append(data.tracker)
+async def add_tracker(
+    callback_query: types.CallbackQuery, callback_data: TrackerCb
+) -> None:
+    settings.FIND_TORRENTS_TRACKERS.append(callback_data.tracker)
     trackers_cache = TrackersCache()
     trackers = trackers_cache.get()
     if trackers is None:
@@ -64,10 +65,9 @@ async def add_tracker(callback_query: types.CallbackQuery):
 
 
 @router.callback_query(TrackerCb.filter(F.action == TrackerListAction.delete))
-async def del_tracker(callback_query: types.CallbackQuery):
-    data = TrackerCb.unpack(callback_query.data)
+async def del_tracker(callback_query: types.CallbackQuery, callback_data: TrackerCb):
     settings.FIND_TORRENTS_TRACKERS = [
-        i for i in settings.FIND_TORRENTS_TRACKERS if i != data.tracker
+        i for i in settings.FIND_TORRENTS_TRACKERS if i != callback_data.tracker
     ]
     trackers_cache = TrackersCache()
     trackers = trackers_cache.get()

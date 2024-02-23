@@ -1,4 +1,4 @@
-__all__ = 'router'
+__all__ = "router"
 from aiogram import Router
 
 from .callback_query_handlers import router as callback_router

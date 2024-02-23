@@ -26,8 +26,6 @@ def torrent_settings_kb(trackers):
         else:
             text = f"{tracker.capitalize()} ❌"
             callback = TrackerCb(tracker=tracker, action=TrackerListAction.add)
-        builder.add(
-            InlineKeyboardButton(text=text, callback_data=callback.pack())
-        )
+        builder.add(InlineKeyboardButton(text=text, callback_data=callback.pack()))
     builder.adjust(1)
     return builder.as_markup()

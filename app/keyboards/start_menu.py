@@ -24,7 +24,8 @@ def start_menu_kb(*, is_admin: bool = False) -> InlineKeyboardMarkup:
         builder.button(
             text="📂 Скачанные торренты",
             callback_data=StartMenuCallbackData(
-                action=Action.downloaded_torrents).pack(),
+                action=Action.downloaded_torrents
+            ).pack(),
         )
     builder.adjust(1)
     return builder.as_markup()

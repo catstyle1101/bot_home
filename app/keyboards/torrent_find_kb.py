@@ -17,7 +17,9 @@ def torrent_find_kb(query: str, current_offset: int = 0) -> InlineKeyboardMarkup
     builder.add(
         InlineKeyboardButton(
             text="◀️",
-            callback_data=NavigateFindTorrentsCb(offset=prev_offset, query=query).pack(),
+            callback_data=NavigateFindTorrentsCb(
+                offset=prev_offset, query=query
+            ).pack(),
         )
     )
     builder.add(
@@ -29,7 +31,9 @@ def torrent_find_kb(query: str, current_offset: int = 0) -> InlineKeyboardMarkup
     builder.add(
         InlineKeyboardButton(
             text="▶️",
-            callback_data=NavigateFindTorrentsCb(offset=next_offset, query=query).pack(),
+            callback_data=NavigateFindTorrentsCb(
+                offset=next_offset, query=query
+            ).pack(),
         )
     )
     builder.adjust(3)

@@ -39,7 +39,8 @@ def generate_torrent_keyboard(
         builder.button(
             text=f"{torrent[1]} {torrent[2]}",
             callback_data=TorrentsListKeyboardCallbackData(
-                torrent_id=torrent[0]).pack(),
+                torrent_id=torrent[0]
+            ).pack(),
         )
     builder.adjust(1)
 
@@ -85,7 +86,7 @@ def generate_del_torrent_kb(torrent_id: int) -> InlineKeyboardMarkup:
                 action=DeleteActionEnum.no_delete,
                 torrent_id=torrent_id,
             ).pack(),
-        )
+        ),
     )
     builder.adjust(2)
     return builder.as_markup()

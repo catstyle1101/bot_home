@@ -24,5 +24,5 @@ __all__ = (
     NavigateFindTorrentsCb,
     torrent_settings_kb,
     TrackerCb,
-    TrackerListAction
+    TrackerListAction,
 )

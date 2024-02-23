@@ -8,8 +8,12 @@ from aiogram.types import CallbackQuery, Message
 
 from config import settings
 from enums import MessageType
-from keyboards import StartMenuCallbackData, Action, torrent_find_kb, \
-    NavigateFindTorrentsCb
+from keyboards import (
+    StartMenuCallbackData,
+    Action,
+    torrent_find_kb,
+    NavigateFindTorrentsCb,
+)
 from torrent_api.fetch import make_magnet_link, scrap_torrents
 from transmission_client import TransmissionClient
 from utils import render_message, prepare_message
@@ -95,10 +99,14 @@ async def show_torrents(message: types.Message, state: FSMContext):
 
 
 @router.callback_query(NavigateFindTorrentsCb.filter())
-async def navigate_find_torrents(callback_query: CallbackQuery):
-    data = NavigateFindTorrentsCb.unpack(callback_query.data)
+async def navigate_find_torrents(
+    callback_query: CallbackQuery,
+    callback_data: NavigateFindTorrentsCb,
+) -> None:
     await callback_query.answer()
-    torrents = await scrap_torrents(query=data.query, offset=data.offset)
+    torrents = await scrap_torrents(
+        query=callback_data.query, offset=callback_data.offset
+    )
     TorrentsCache.torrents = torrents
     TorrentsCache.timestamp = datetime.now().timestamp() * 60 * 10
     if torrents:
