@@ -12,22 +12,21 @@ def session_maker():
     Returns:
     - aiohttp.ClientSession: A session object for making HTTP requests.
     """
-    session = aiohttp.ClientSession(
-        base_url='https://api.freedomist.ru')
+    session = aiohttp.ClientSession(base_url="https://api.freedomist.ru")
     return session
 
 
 async def fetch_url(
-        url: str,
-        *,
-        query: str,
-        trackers: list[str] = settings.FIND_TORRENTS_TRACKERS,
-        order_by: str = 's',
-        filter_by_size: str = '',
-        limit: int = settings.FIND_TORRENTS_LIMIT,
-        offset: int = 0,
-        full_match: bool = True,
-        token: str = ''
+    url: str,
+    *,
+    query: str,
+    trackers: list[str] = settings.FIND_TORRENTS_TRACKERS,
+    order_by: str = "s",
+    filter_by_size: str = "",
+    limit: int = settings.FIND_TORRENTS_LIMIT,
+    offset: int = 0,
+    full_match: bool = True,
+    token: str = "",
 ) -> json:
     """
     Asynchronously fetches data from a given URL using a POST request
@@ -80,18 +79,17 @@ async def scrap_torrents(**kwargs) -> dict[str, TorrentFormatter]:
     - dict[str, TorrentFormatter]: A dictionary containing the magnet
         keys and their corresponding formatted torrent data.
     """
-    raw_data = await fetch_url('/search', **kwargs)
-    data = {i['magnet_key']: format_data(i) for i in raw_data['data']}
+    raw_data = await fetch_url("/search", **kwargs)
+    data = {i["magnet_key"]: format_data(i) for i in raw_data["data"]}
     return data
 
 
 async def list_of_trackers(**kwargs) -> list[str]:
     trackers = []
     async with session_maker() as session:
-        async with session.get('/trackers', ssl=False) as response:
+        async with session.get("/trackers", ssl=False) as response:
             trackers = (await response.json()).get("data")
     return trackers
-
 
 
 async def make_magnet_link(torrent: TorrentFormatter):
@@ -105,10 +103,8 @@ async def make_magnet_link(torrent: TorrentFormatter):
     - TorrentFormatter: The torrent object with the magnet link added.
     """
     async with session_maker() as session:
-        async with session.get(
-            f'/magnet/{torrent.magnet_key}', ssl=False
-        ) as response:
+        async with session.get(f"/magnet/{torrent.magnet_key}", ssl=False) as response:
             res = await response.json()
-            if res['status_code'] == 200:
-                torrent.magnet_link = res['data']['magnet_link']
+            if res["status_code"] == 200:
+                torrent.magnet_link = res["data"]["magnet_link"]
     return torrent

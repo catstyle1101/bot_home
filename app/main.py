@@ -24,7 +24,6 @@ def main() -> None:
             secret_token=settings.WEBHOOK_SECRET,
             drop_pending_updates=True,
             allowed_updates=dp.resolve_used_update_types(),
-
         )
         if res:
             logger.info("Webhook installed successfully")
@@ -39,14 +38,8 @@ def main() -> None:
 
         await bot.set_my_commands(
             [
-                BotCommand(
-                    command="start",
-                    description="Начало работы с ботом."
-                ),
-                BotCommand(
-                    command="help",
-                    description="Бот домашний помощник."
-                )
+                BotCommand(command="start", description="Начало работы с ботом."),
+                BotCommand(command="help", description="Бот домашний помощник."),
             ],
             scope=BotCommandScopeAllPrivateChats(),
         )
@@ -63,7 +56,6 @@ def main() -> None:
     dp.shutdown.register(on_shutdown)
 
     bot = Bot(settings.BOT_TOKEN, parse_mode=ParseMode.HTML)
-
 
     app = web.Application()
 

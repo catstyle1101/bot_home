@@ -100,8 +100,8 @@ async def delete_torrent_page(
         torrent_name=torrent_name,
     )
     await callback_query.answer()
-    await callback_query.message.edit_text(text=message)
-    await callback_query.message.edit_reply_markup(
+    await callback_query.message.edit_text(
+        text=message,
         reply_markup=generate_del_torrent_kb(callback_data.torrent_id)
     )
 
@@ -126,8 +126,8 @@ async def delete_torrent(
     torrents = transmission.get_downloaded_torrents()
     cache = Cache()
     cache.set_torrents(torrents)
-    await callback_query.message.edit_text(text=message)
-    await callback_query.message.edit_reply_markup(
+    await callback_query.message.edit_text(
+        text=message,
         reply_markup=generate_torrent_keyboard(torrents=torrents)
     )
 
@@ -147,13 +147,13 @@ async def no_delete_torrent(
         torrent_name=torrent_name,
         is_deleted=False,
     )
-    await callback_query.message.edit_text(text=message)
     cache = Cache()
     torrents = cache.get_torrents()
     if torrents is None:
         transmission = TransmissionClient()
         torrents = transmission.get_downloaded_torrents()
         cache.set_torrents(torrents)
-    await callback_query.message.edit_reply_markup(
-        reply_markup=generate_torrent_keyboard(torrents=torrents)
+    await callback_query.message.edit_text(
+        text=message,
+        reply_markup=generate_torrent_keyboard(torrents=torrents),
     )

@@ -11,8 +11,8 @@ class IsAdminMiddleware(BaseMiddleware):
         self,
         handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
         event: Message,
-        data: Dict[str, Any]
+        data: Dict[str, Any],
     ) -> Any:
         is_admin = settings.user_is_admin(event.from_user.id)
-        data['is_admin'] = is_admin
+        data["is_admin"] = is_admin
         return await handler(event, data)

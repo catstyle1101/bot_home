@@ -116,11 +116,11 @@ async def navigate_find_torrents(
             is_short=False,
         )
         answer_messages = prepare_message(message=answer, delimiter=" ..")
-        await callback_query.message.edit_text(text=answer_messages[0])
-        await callback_query.message.edit_reply_markup(
+        await callback_query.message.edit_text(
+            text=answer_messages[0],
             reply_markup=torrent_find_kb(
-                query=data.query,
-                current_offset=data.offset,
+                query=callback_data.query,
+                current_offset=callback_data.offset,
             ),
         )
 

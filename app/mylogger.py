@@ -28,9 +28,11 @@ class MyJSONFormatter(logging.Formatter):
             always_fields["stack_info"] = self.formatStack(record.stack_info)
 
         message = {
-            key: msg_val
-            if (msg_val := always_fields.pop(val, None)) is not None
-            else getattr(record, val)
+            key: (
+                msg_val
+                if (msg_val := always_fields.pop(val, None)) is not None
+                else getattr(record, val)
+            )
             for key, val in self.fmt_keys.items()
         }
         message.update(always_fields)
@@ -41,14 +43,14 @@ class MyJSONFormatter(logging.Formatter):
 class ColorFormatter(logging.Formatter):
 
     level_color = {
-        'CRITICAL': '\033[35;1m%s\033[0m',    # Пурпурный, жирный
-        'FATAL':    '\033[36;1m%s\033[0m',    # Голубой, жирный
-        'ERROR':    '\033[31;1m%s\033[0m',    # Красный, жирный
-        'WARNING':  '\033[33;1m%s\033[0m',    # Желтый, жирный
-        'WARN':     '\033[33;1m%s\033[0m',    # Желтый, жирный
-        'INFO':     '%s',                     # Обычный
-        'TRACE':    '\033[32m%s\033[0m',      # Синий
-        'DEBUG':    '\033[34m%s\033[0m',      # Зеленый
+        "CRITICAL": "\033[35;1m%s\033[0m",  # Пурпурный, жирный
+        "FATAL": "\033[36;1m%s\033[0m",  # Голубой, жирный
+        "ERROR": "\033[31;1m%s\033[0m",  # Красный, жирный
+        "WARNING": "\033[33;1m%s\033[0m",  # Желтый, жирный
+        "WARN": "\033[33;1m%s\033[0m",  # Желтый, жирный
+        "INFO": "%s",  # Обычный
+        "TRACE": "\033[32m%s\033[0m",  # Синий
+        "DEBUG": "\033[34m%s\033[0m",  # Зеленый
     }
 
     def format(self, record):

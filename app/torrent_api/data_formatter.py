@@ -14,7 +14,7 @@ class TorrentFormatter:
     downloads: int
     seeders: int
     leechers: int
-    magnet_link: str = ''
+    magnet_link: str = ""
 
 
 def format_data(data: json) -> TorrentFormatter:
@@ -28,14 +28,15 @@ def format_data(data: json) -> TorrentFormatter:
     - TorrentFormatter: The formatted data as a TorrentFormatter object.
     """
     return TorrentFormatter(
-        title=data['title'],
-        magnet_key=data['magnet_key'],
-        size=data['size'],
-        downloads=data['downloads'],
+        title=data["title"],
+        magnet_key=data["magnet_key"],
+        size=data["size"],
+        downloads=data["downloads"],
         post_datetime=datetime.datetime.strptime(
-            data['post_datetime'], '%Y-%m-%d %H:%M:%S'),
-        seeders=int(data['seeders']),
-        leechers=int(data['leechers']),
-        rank=int(data['rank']),
-        tracker=data['tracker'],
+            data["post_datetime"], "%Y-%m-%d %H:%M:%S"
+        ),
+        seeders=int(data["seeders"]),
+        leechers=int(data["leechers"]),
+        rank=int(data["rank"]),
+        tracker=data["tracker"],
     )
