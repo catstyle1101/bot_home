@@ -4,15 +4,16 @@ from datetime import datetime
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery
 
 from config import settings
-from enums import MessageType
+from enums import MessageType, ErrorMessage
 from keyboards import (
     StartMenuCallbackData,
     Action,
     torrent_find_kb,
     NavigateFindTorrentsCb,
+    start_menu_kb,
 )
 from torrent_api.fetch import make_magnet_link, scrap_torrents
 from transmission_client import TransmissionClient
@@ -104,24 +105,30 @@ async def navigate_find_torrents(
     callback_data: NavigateFindTorrentsCb,
 ) -> None:
     await callback_query.answer()
-    torrents = await scrap_torrents(
-        query=callback_data.query, offset=callback_data.offset
-    )
-    TorrentsCache.torrents = torrents
-    TorrentsCache.timestamp = datetime.now().timestamp() * 60 * 10
-    if torrents:
-        answer = render_message(
-            MessageType.format_find_torrent,
-            torrents=[i for i in torrents.values()],
-            is_short=False,
+    try:
+        torrents = await scrap_torrents(
+            query=callback_data.query, offset=callback_data.offset
         )
-        answer_messages = prepare_message(message=answer, delimiter=" ..")
+        TorrentsCache.torrents = torrents
+        TorrentsCache.timestamp = datetime.now().timestamp() * 60 * 10
+        if torrents:
+            answer = render_message(
+                MessageType.format_find_torrent,
+                torrents=[i for i in torrents.values()],
+                is_short=False,
+            )
+            answer_messages = prepare_message(message=answer, delimiter=" ..")
+            await callback_query.message.edit_text(
+                text=answer_messages[0],
+                reply_markup=torrent_find_kb(
+                    query=callback_data.query,
+                    current_offset=callback_data.offset,
+                ),
+            )
+    except Exception:
         await callback_query.message.edit_text(
-            text=answer_messages[0],
-            reply_markup=torrent_find_kb(
-                query=callback_data.query,
-                current_offset=callback_data.offset,
-            ),
+            text=ErrorMessage.api_not_found,
+            reply_markup=start_menu_kb(),
         )
 
 

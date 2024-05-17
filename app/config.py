@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     TRANSMISSION_PASSWORD: str
     TRANSMISSION_HOST: str
     ADMINS: str | int | set[int] = ""
+    TORRENT_API: str = "https://api.exfreedomist.com"
 
     WEB_SERVER_HOST: str = "bot"
     WEB_SERVER_PORT: int = 8080

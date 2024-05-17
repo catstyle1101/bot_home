@@ -12,7 +12,7 @@ def session_maker():
     Returns:
     - aiohttp.ClientSession: A session object for making HTTP requests.
     """
-    session = aiohttp.ClientSession(base_url="https://api.freedomist.ru")
+    session = aiohttp.ClientSession(base_url=settings.TORRENT_API)
     return session
 
 

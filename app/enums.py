@@ -10,3 +10,7 @@ class MessageType(StrEnum):
     download_magnet = "messages/download_magnet.j2"
     format_find_torrent = "messages/format_find_torrent.j2"
     nothing_found = "messages/nothing_found.j2"
+
+
+class ErrorMessage(StrEnum):
+    api_not_found = "Не могу подключиться к API серверу. Он переехал? Попробуй позже."
