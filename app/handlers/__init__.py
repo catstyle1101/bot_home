@@ -14,8 +14,8 @@ router.include_routers(
     find_torrent_router,
     callback_router,
     find_torrent_settings_router,
-    commands_router,
     magnet_download_router,
+    commands_router,
 )
 # This must be the last one!
 router.include_router(common_router)

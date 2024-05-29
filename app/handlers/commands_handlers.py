@@ -1,5 +1,6 @@
 from aiogram import Router, types
 from aiogram.filters import CommandStart, Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from config import settings
@@ -13,7 +14,12 @@ router.message.middleware(IsAdminMiddleware())
 
 
 @router.message(CommandStart())
-async def command_start_handler(message: Message, is_admin: bool) -> None:
+async def command_start_handler(
+    message: Message,
+    is_admin: bool,
+    state: FSMContext,
+) -> None:
+    await state.clear()
     start_message = render_message(
         MessageType.start_menu,
         name=message.from_user.full_name,
