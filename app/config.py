@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     TRANSMISSION_LOGIN: str
     TRANSMISSION_PASSWORD: str
     TRANSMISSION_HOST: str
+    FREEDOMIST_TOKEN: str
     ADMINS: str | int | set[int] = ""
     TORRENT_API: str = "https://api.exfreedomist.com"
 

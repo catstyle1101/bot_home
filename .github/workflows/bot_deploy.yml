@@ -71,6 +71,7 @@ jobs:
             echo TRANSMISSION_HOST=${{ secrets.TRANSMISSION_HOST }} >> .env
             echo DOCKERHUB_USER=${{ secrets.DOCKER_USERNAME }} >> .env
             echo BOT_CONTAINER_NAME=${{ secrets.BOT_CONTAINER_NAME }} >> .env
+            echo FREEDOMIST_TOKEN=${{ secrets.FREEDOMIST_TOKEN }} >> .env
             sudo docker compose down
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.BOT_CONTAINER_NAME }}
             sudo docker compose up -d

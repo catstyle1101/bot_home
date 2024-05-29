@@ -68,7 +68,10 @@ async def fetch_url(
             return await response.json()
 
 
-async def scrap_torrents(**kwargs) -> dict[str, TorrentFormatter]:
+async def scrap_torrents(
+        token=settings.FREEDOMIST_TOKEN,
+        **kwargs,
+) -> dict[str, TorrentFormatter]:
     """
     An asynchronous function that scrapes torrents based on a given query.
 
@@ -79,7 +82,7 @@ async def scrap_torrents(**kwargs) -> dict[str, TorrentFormatter]:
     - dict[str, TorrentFormatter]: A dictionary containing the magnet
         keys and their corresponding formatted torrent data.
     """
-    raw_data = await fetch_url("/search", **kwargs)
+    raw_data = await fetch_url("/search", **kwargs, token=token)
     data = {i["magnet_key"]: format_data(i) for i in raw_data["data"]}
     return data
 
