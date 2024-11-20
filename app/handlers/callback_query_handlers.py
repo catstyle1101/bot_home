@@ -1,8 +1,6 @@
 import logging
-from datetime import datetime
 
 from aiogram import Router, F, types
-from transmission_rpc import Torrent
 
 from enums import MessageType
 from keyboards import (
@@ -15,47 +13,26 @@ from keyboards import (
     TorrentsListKeyboardCallbackData,
     DeleteActionEnum,
 )
-from transmission_client import TransmissionClient
+from provider.protocols import Downloader, Cache
 from utils import render_message
 
 router = Router(name=__name__)
 
 logger = logging.getLogger(__name__)
 
-MINUTES = 60
-
-
-class Cache:
-    _torrents: list | None = []
-    _expires_at: int | float | None = None
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls)
-        return cls._instance
-
-    def get_torrents(self) -> list[Torrent] | None:
-        now = datetime.now().timestamp()
-        if self._expires_at is None or now > self._expires_at:
-            return None
-        return self._torrents
-
-    def set_torrents(self, torrents: list[Torrent]) -> None:
-        self._expires_at = datetime.now().timestamp() + 10 * MINUTES
-        self._torrents = torrents
-
 
 @router.callback_query(
     StartMenuCallbackData.filter(F.action == Action.downloaded_torrents)
 )
-async def downloaded_torrents(callback_query: types.CallbackQuery):
+async def downloaded_torrents(
+    callback_query: types.CallbackQuery,
+    downloader: Downloader,
+    cache: Cache,
+) -> None:
     await callback_query.answer()
-    cache = Cache()
     torrents = cache.get_torrents()
-    if torrents is None:
-        transmission = TransmissionClient()
-        torrents = transmission.get_downloaded_torrents()
+    if not torrents:
+        torrents = downloader.get_downloaded_torrents()
         cache.set_torrents(torrents)
     await callback_query.message.edit_text(
         text="Список скачанных торрентов:" if torrents else "Ничего не скачано еще.",
@@ -73,13 +50,13 @@ async def downloaded_torrents(callback_query: types.CallbackQuery):
 async def navigate_torrents(
     callback_query: types.CallbackQuery,
     callback_data: NavigateTorrentsListCallbackData,
+    downloader: Downloader,
+    cache: Cache,
 ):
     await callback_query.answer()
-    cache = Cache()
     torrents = cache.get_torrents()
-    if torrents is None:
-        transmission = TransmissionClient()
-        torrents = transmission.get_downloaded_torrents()
+    if not torrents:
+        torrents = downloader.get_downloaded_torrents()
     await callback_query.message.edit_reply_markup(
         reply_markup=generate_torrent_keyboard(
             torrents=torrents,
@@ -92,17 +69,16 @@ async def navigate_torrents(
 async def delete_torrent_page(
     callback_query: types.CallbackQuery,
     callback_data: TorrentDelConfirmCallbackData,
+    downloader: Downloader,
 ):
-    transmission = TransmissionClient()
-    torrent_name = transmission.get_torrent_name(callback_data.torrent_id)
+    torrent = downloader.get_torrent_by_id(callback_data.torrent_id)
     message = render_message(
         template_name=MessageType.delete_torrent,
-        torrent_name=torrent_name,
+        torrent=torrent,
     )
     await callback_query.answer()
     await callback_query.message.edit_text(
-        text=message,
-        reply_markup=generate_del_torrent_kb(callback_data.torrent_id)
+        text=message, reply_markup=generate_del_torrent_kb(callback_data.torrent_id)
     )
 
 
@@ -112,23 +88,21 @@ async def delete_torrent_page(
 async def delete_torrent(
     callback_query: types.CallbackQuery,
     callback_data: TorrentDelConfirmCallbackData,
+    downloader: Downloader,
+    cache: Cache,
 ):
-    transmission = TransmissionClient()
-    torrent_name = transmission.get_torrent_name(callback_data.torrent_id)
-    transmission = TransmissionClient()
-    is_deleted = transmission.del_torrent(index=callback_data.torrent_id)
+    torrent = downloader.get_torrent_by_id(callback_data.torrent_id)
+    is_deleted = downloader.delete_torrent_by_id(callback_data.torrent_id)
     message = render_message(
         MessageType.confirm_delete_message,
-        torrent_name=torrent_name,
+        torrent_name=torrent.name,
         is_deleted=is_deleted,
     )
     await callback_query.answer(text=message, show_alert=True)
-    torrents = transmission.get_downloaded_torrents()
-    cache = Cache()
+    torrents = downloader.get_downloaded_torrents()
     cache.set_torrents(torrents)
     await callback_query.message.edit_text(
-        text=message,
-        reply_markup=generate_torrent_keyboard(torrents=torrents)
+        text=message, reply_markup=generate_torrent_keyboard(torrents=torrents)
     )
 
 
@@ -138,20 +112,19 @@ async def delete_torrent(
 async def no_delete_torrent(
     callback_query: types.CallbackQuery,
     callback_data: TorrentDelConfirmCallbackData,
+    downloader: Downloader,
+    cache: Cache,
 ):
     await callback_query.answer()
-    transmission = TransmissionClient()
-    torrent_name = transmission.get_torrent_name(callback_data.torrent_id)
+    torrent_name = downloader.get_torrent_by_id(callback_data.torrent_id)
     message = render_message(
         MessageType.confirm_delete_message,
         torrent_name=torrent_name,
         is_deleted=False,
     )
-    cache = Cache()
     torrents = cache.get_torrents()
-    if torrents is None:
-        transmission = TransmissionClient()
-        torrents = transmission.get_downloaded_torrents()
+    if not torrents:
+        torrents = downloader.get_downloaded_torrents()
         cache.set_torrents(torrents)
     await callback_query.message.edit_text(
         text=message,

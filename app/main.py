@@ -12,6 +12,8 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 
 from handlers import router
 from config import settings
+from provider.qbittorrent import QBittorrent
+from provider.memcache import Cache as MemCache
 
 
 def main() -> None:
@@ -20,8 +22,8 @@ def main() -> None:
     async def on_startup(bot: Bot) -> None:
         logger = logging.getLogger(__name__)
         res = await bot.set_webhook(
-            f"https://{settings.DOMAIN}{settings.WEBHOOK_PATH}",
-            secret_token=settings.WEBHOOK_SECRET,
+            f"https://{settings.DOMAIN}{settings.WEBHOOK.PATH}",
+            secret_token=settings.WEBHOOK.SECRET,
             drop_pending_updates=True,
             allowed_updates=dp.resolve_used_update_types(),
         )
@@ -62,16 +64,18 @@ def main() -> None:
     webhook_requests_handler = SimpleRequestHandler(
         dispatcher=dp,
         bot=bot,
-        secret_token=settings.WEBHOOK_SECRET,
+        secret_token=settings.WEBHOOK.SECRET,
+        downloader=QBittorrent(),
+        cache=MemCache(),
     )
-    webhook_requests_handler.register(app, path=settings.WEBHOOK_PATH)
+    webhook_requests_handler.register(app, path=settings.WEBHOOK.PATH)
 
     setup_application(app, dp, bot=bot)
 
     web.run_app(app, host=settings.WEB_SERVER_HOST, port=settings.WEB_SERVER_PORT)
 
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-    context.load_cert_chain(settings.WEBHOOK_SSL_CERT, settings.WEBHOOK_SSL_PRIV)
+    context.load_cert_chain(settings.WEBHOOK.SSL_CERT, settings.WEBHOOK.SSL_PRIV)
 
     web.run_app(
         app,

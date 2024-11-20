@@ -6,6 +6,7 @@ from transmission_rpc import Client
 from transmission_rpc.error import TransmissionError
 
 
+# TODO переписать на протоколы. Этот класс нигде не используется на данный момент.
 class TransmissionClient:
     def __init__(self):
         """
@@ -25,10 +26,12 @@ class TransmissionClient:
         Returns:
             None
         """
+
+        self.log = logging.getLogger(__name__)
+        self.log.warning("This class deprecated, do not use it")
         USER = settings.TRANSMISSION_LOGIN
         PASSWORD = settings.TRANSMISSION_PASSWORD
         HOST = settings.TRANSMISSION_HOST
-        self.log = logging.getLogger(__name__)
         try:
             self.client = Client(host=HOST, port=9091, username=USER, password=PASSWORD)
         except TransmissionError as e:

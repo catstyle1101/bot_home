@@ -3,8 +3,9 @@ disable_existing_loggers: false
 formatters:
   simple:
     (): mylogger.ColorFormatter
-    format: '%(levelname)s: %(message)s'
-    datefmt: "%Y-%m-%dT%H:%M:%S%z"
+    format: '{asctime}[{levelname: ^8}] {name: >25} - {message}'
+    datefmt: '%Y-%m-%dT%H:%M:%S %Z'
+    style: '{'
   json:
     (): mylogger.MyJSONFormatter
     fmt_keys:

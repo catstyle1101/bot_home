@@ -4,7 +4,7 @@ from enum import StrEnum, auto
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from transmission_rpc import Torrent
+from provider.schemas import Torrent
 
 from config import settings
 
@@ -15,11 +15,11 @@ class DeleteActionEnum(StrEnum):
 
 
 class TorrentsListKeyboardCallbackData(CallbackData, prefix="del_list_torrents"):
-    torrent_id: int
+    torrent_id: int | str | None
 
 
-class TorrentDelConfirmCallbackData(CallbackData, prefix="delete_torrent_confirm"):
-    torrent_id: int
+class TorrentDelConfirmCallbackData(CallbackData, prefix="del_t_conf"):
+    torrent_id: int | str | None
     action: DeleteActionEnum
 
 
@@ -37,9 +37,9 @@ def generate_torrent_keyboard(
     torrents = list(itertools.batched(torrents, n=page_size))
     for torrent in torrents[page]:
         builder.button(
-            text=f"{torrent[1]} {torrent[2]}",
+            text=f"{torrent.name} {torrent.str_size}",
             callback_data=TorrentsListKeyboardCallbackData(
-                torrent_id=torrent[0]
+                torrent_id=torrent.id
             ).pack(),
         )
     builder.adjust(1)

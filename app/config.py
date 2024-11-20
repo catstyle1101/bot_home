@@ -1,26 +1,38 @@
-from typing import Any, Literal
+from typing import Any
 
+from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class HostBaseAuth(BaseModel):
+    HOST: str = "http://somehosthere"
+    LOGIN: str
+    PASSWORD: str
+
+
+class Webhook(BaseModel):
+    PATH: str = "/webhook"
+    SSL_CERT: str = "./certs/YOURPUBLIC.pem"
+    SSL_PRIV: str = "./certs/YOURPRIVATE.key"
+    SECRET: str
+
+
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict()
+    model_config = SettingsConfigDict(env_nested_delimiter="__")
+
+    TRANSMISSION: HostBaseAuth
+    QBITTORRENT: HostBaseAuth
+    RUTRACKER: HostBaseAuth
+    WEBHOOK: Webhook
 
     BOT_TOKEN: str
-    WEBHOOK_SECRET: str
     DOMAIN: str
-    TRANSMISSION_LOGIN: str
-    TRANSMISSION_PASSWORD: str
-    TRANSMISSION_HOST: str
     FREEDOMIST_TOKEN: str
     ADMINS: str | int | set[int] = ""
     TORRENT_API: str = "https://api.exfreedomist.com"
 
     WEB_SERVER_HOST: str = "bot"
     WEB_SERVER_PORT: int = 8080
-    WEBHOOK_PATH: str = "/webhook"
-    WEBHOOK_SSL_CERT: str = "./certs/YOURPUBLIC.pem"
-    WEBHOOK_SSL_PRIV: str = "./certs/YOURPRIVATE.key"
     SHOW_TORRENTS_PAGE_SIZE: int = 10
     FIND_TORRENTS_LIMIT: int = 15
     FIND_TORRENTS_TRACKERS: list[str] = ["rutracker"]

@@ -73,8 +73,11 @@ pydantic-settings==2.1.0
 pydantic_core==2.14.6
 python-dotenv==1.0.1
 PyYAML==6.0.1
+python_qbittorrent==0.4.*
 requests==2.31.0
 transmission-rpc==3.4.0
 typing_extensions==4.9.0
 urllib3==2.2.1
 yarl==1.9.4
+
+beautifulsoup4~=4.12.3

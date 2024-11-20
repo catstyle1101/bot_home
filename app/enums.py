@@ -14,3 +14,4 @@ class MessageType(StrEnum):
 
 class ErrorMessage(StrEnum):
     api_not_found = "Не могу подключиться к API серверу. Он переехал? Попробуй позже."
+    magnet_not_added_to_download = "Ошибка при добавлении magnet ссылки."
