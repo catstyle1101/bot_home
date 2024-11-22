@@ -37,7 +37,7 @@ async def command_start_handler(
 async def command_help_handler(message: types.Message) -> None:
     if not message.from_user:
         return None
-    is_admin = message.from_user.id in settings.ADMINS
+    is_admin = message.from_user.id in settings.ADMIN_LIST
     answer = render_message(
         MessageType.help_command,
         is_admin=is_admin,

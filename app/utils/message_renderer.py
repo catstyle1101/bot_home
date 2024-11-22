@@ -1,4 +1,5 @@
 from typing import Unpack, TypedDict, NotRequired, TYPE_CHECKING
+
 # from typing_extensions import TypedDict, Unpack # < Python 3.12
 
 
@@ -12,12 +13,12 @@ if TYPE_CHECKING:
 class Kw(TypedDict):
     is_admin: NotRequired[bool]
     result: NotRequired[bool]
-    torrents: NotRequired[list[TorrentFormatter]]
+    torrents: NotRequired[list["TorrentFormatter"]]
     is_short: NotRequired[bool]
     name: NotRequired[str]
     torrent_name: NotRequired[str]
     is_deleted: NotRequired[bool]
-    torrent: NotRequired[Torrent]
+    torrent: NotRequired["Torrent"]
 
 
 def render_message(template_name: str, **kwargs: Unpack[Kw]) -> str:

@@ -24,11 +24,13 @@ class Settings(BaseSettings):
     QBITTORRENT: HostBaseAuth
     RUTRACKER: HostBaseAuth
     WEBHOOK: Webhook
+    DEBUG: bool = False
 
     BOT_TOKEN: str
     DOMAIN: str
     FREEDOMIST_TOKEN: str
-    ADMINS: str | set[int] = ""
+    ADMINS: str | int | set[int] = ""
+    ADMIN_LIST: set[int] = set()
     TORRENT_API: str = "https://api.exfreedomist.com"
 
     WEB_SERVER_HOST: str = "bot"
@@ -39,10 +41,14 @@ class Settings(BaseSettings):
 
     def model_post_init(self, __context: Any) -> None:
         if isinstance(self.ADMINS, str):
-            self.ADMINS = set(int(i) for i in self.ADMINS.strip().split(","))
+            self.ADMIN_LIST = set(int(i) for i in self.ADMINS.strip().split(","))
+        elif isinstance(self.ADMINS, int):
+            self.ADMIN_LIST = {self.ADMINS}
+        elif isinstance(self.ADMINS, set):
+            self.ADMIN_LIST = self.ADMINS
 
     def user_is_admin(self, user_id: int | str) -> bool:
-        return int(user_id) in set(int(i) for i in self.ADMINS)
+        return int(user_id) in set(int(i) for i in self.ADMIN_LIST)
 
 
 settings = Settings()  # type: ignore

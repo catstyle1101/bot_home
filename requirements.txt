@@ -80,8 +80,6 @@ Jinja2==3.1.4
 magic-filter==1.0.12
 MarkupSafe==3.0.2
 multidict==6.1.0
-mypy==1.13.0
-mypy-extensions==1.0.0
 propcache==0.2.0
 pydantic==2.9.2
 pydantic-settings==2.6.1
@@ -92,10 +90,6 @@ requests==2.32.3
 six==1.16.0
 soupsieve==2.6
 transmission-rpc==7.0.11
-types-beautifulsoup4==4.12.0.20241020
-types-html5lib==1.1.11.20241018
-types-PyYAML==6.0.12.20240917
-types-requests==2.32.0.20241016
-typing_extensions==4.12.2
 urllib3==2.2.3
 yarl==1.18.0
+python_qbittorrent==0.4.3

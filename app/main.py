@@ -1,6 +1,7 @@
 import atexit
 import logging.config
 
+from aiogram.client.default import DefaultBotProperties
 from aiogram.types import BotCommand, BotCommandScopeAllPrivateChats
 from aiohttp import web
 import ssl
@@ -29,7 +30,7 @@ def main() -> None:
         )
         if res:
             logger.info("Webhook installed successfully")
-            for admin_id in settings.ADMINS:
+            for admin_id in settings.ADMIN_LIST:
                 try:
                     await bot.send_message(chat_id=admin_id, text="Bot is online!")
                     logger.info(f"Message to admin {admin_id} was sent.")
@@ -57,7 +58,10 @@ def main() -> None:
     dp.startup.register(on_startup)
     dp.shutdown.register(on_shutdown)
 
-    bot = Bot(settings.BOT_TOKEN, parse_mode=ParseMode.HTML)
+    bot = Bot(
+        settings.BOT_TOKEN,
+        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
+    )
 
     app = web.Application()
 
@@ -89,6 +93,11 @@ if __name__ == "__main__":
     with open("logging_config.yml", "r", encoding="utf-8") as file:
         logging_config = yaml.safe_load(file)
     logging.config.dictConfig(logging_config)
+    if settings.DEBUG:
+        logger = logging.getLogger(__name__)
+        for handler in logger.handlers:
+            handler.setLevel(logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG)
     queue_handler = logging.getHandlerByName("queue_handler")
     if queue_handler and hasattr(queue_handler, "listener"):
         queue_handler.listener.start()

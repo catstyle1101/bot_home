@@ -1,4 +1,9 @@
 services:
+  test:
+    build:
+      context: ../
+      target: test
+
   ngrok:
     image: ngrok/ngrok:latest
     restart: unless-stopped
@@ -11,8 +16,12 @@ services:
       - "4040:4040"
     env_file:
       - .env
+
   bot:
     image: ${DOCKERHUB_USER}/${BOT_CONTAINER_NAME}:latest
     restart: on-failure
     env_file:
       - .env
+    depends_on:
+      - ngrok
+      - test
