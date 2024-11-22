@@ -1,6 +1,4 @@
 from dataclasses import dataclass
-import datetime
-import json
 
 
 @dataclass
@@ -16,7 +14,7 @@ class TorrentFormatter:
     magnet_link: str = ""
 
 
-def format_data(data: json) -> TorrentFormatter:
+def format_data(data: dict[str, str | int]) -> TorrentFormatter:
     """
     Format the given data into a TorrentFormatter object.
 
@@ -27,12 +25,12 @@ def format_data(data: json) -> TorrentFormatter:
     - TorrentFormatter: The formatted data as a TorrentFormatter object.
     """
     return TorrentFormatter(
-        title=data["title"],
-        magnet_key=data["magnet_key"],
-        size=data["size"],
-        downloads=data["downloads"],
+        title=str(data["title"]),
+        magnet_key=str(data["magnet_key"]),
+        size=str(data["size"]),
+        downloads=int(data["downloads"]),
         seeders=int(data["seeders"]),
         leechers=int(data["leechers"]),
         rank=int(data["rank"]),
-        tracker=data["tracker"],
+        tracker=str(data["tracker"]),
     )

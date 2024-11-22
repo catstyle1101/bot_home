@@ -1,3 +1,5 @@
+from typing import Any
+
 import aiohttp
 import json
 
@@ -5,7 +7,7 @@ from config import settings
 from torrent_api.data_formatter import format_data, TorrentFormatter
 
 
-def session_maker():
+def session_maker() -> aiohttp.ClientSession:
     """
     Create and return a session object for making HTTP requests.
 
@@ -27,7 +29,7 @@ async def fetch_url(
     offset: int = 0,
     full_match: bool = True,
     token: str = "",
-) -> json:
+) -> Any:
     """
     Asynchronously fetches data from a given URL using a POST request
     with a JSON payload.
@@ -69,8 +71,8 @@ async def fetch_url(
 
 
 async def scrap_torrents(
-        token=settings.FREEDOMIST_TOKEN,
-        **kwargs,
+    token: str = settings.FREEDOMIST_TOKEN,
+    **kwargs: Any,
 ) -> dict[str, TorrentFormatter]:
     """
     An asynchronous function that scrapes torrents based on a given query.
@@ -87,7 +89,7 @@ async def scrap_torrents(
     return data
 
 
-async def list_of_trackers(**kwargs) -> list[str]:
+async def list_of_trackers() -> list[str]:
     trackers = []
     async with session_maker() as session:
         async with session.get("/trackers", ssl=False) as response:
@@ -95,7 +97,7 @@ async def list_of_trackers(**kwargs) -> list[str]:
     return trackers
 
 
-async def make_magnet_link(torrent: TorrentFormatter):
+async def make_magnet_link(torrent: TorrentFormatter) -> TorrentFormatter:
     """
     Asynchronously creates a magnet link for a given torrent.
 

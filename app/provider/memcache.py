@@ -11,7 +11,7 @@ class Cache:
     _expires_at: int | float | None = None
     _instance = None
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls) -> "Cache":
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
         return cls._instance

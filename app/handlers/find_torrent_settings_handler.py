@@ -18,13 +18,13 @@ HOURS = 60 * 60
 
 
 class TrackersCache:
-    _trackers: list | None = []
+    _trackers: list[str] | None = []
     _expires_at: int | float | None = None
     _instance = None
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls) -> "TrackersCache":
         if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls, *args, **kwargs)
+            cls._instance = object.__new__(cls)
         return cls._instance
 
     def get(self) -> list[str] | None:
@@ -39,7 +39,7 @@ class TrackersCache:
 
 
 @router.message(Command("torrent_settings"))
-async def torrent_settings_handler(message: types.Message):
+async def torrent_settings_handler(message: types.Message) -> None:
     answer = render_message(MessageType.torrent_settings)
     trackers_cache = TrackersCache()
     trackers = trackers_cache.get()
@@ -59,13 +59,17 @@ async def add_tracker(
     if trackers is None:
         trackers = await list_of_trackers()
         trackers_cache.set(trackers)
+    if not isinstance(callback_query, types.Message):
+        return None
     await callback_query.message.edit_reply_markup(
         reply_markup=torrent_settings_kb(trackers=trackers)
     )
 
 
 @router.callback_query(TrackerCb.filter(F.action == TrackerListAction.delete))
-async def del_tracker(callback_query: types.CallbackQuery, callback_data: TrackerCb):
+async def del_tracker(
+    callback_query: types.CallbackQuery, callback_data: TrackerCb
+) -> None:
     settings.FIND_TORRENTS_TRACKERS = [
         i for i in settings.FIND_TORRENTS_TRACKERS if i != callback_data.tracker
     ]
@@ -74,6 +78,8 @@ async def del_tracker(callback_query: types.CallbackQuery, callback_data: Tracke
     if trackers is None:
         trackers = await list_of_trackers()
         trackers_cache.set(trackers)
+    if not isinstance(callback_query, types.Message):
+        return None
     await callback_query.message.edit_reply_markup(
         reply_markup=torrent_settings_kb(trackers=trackers)
     )

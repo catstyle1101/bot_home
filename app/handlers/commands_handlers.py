@@ -20,6 +20,8 @@ async def command_start_handler(
     state: FSMContext,
 ) -> None:
     await state.clear()
+    if not message.from_user:
+        return None
     start_message = render_message(
         MessageType.start_menu,
         name=message.from_user.full_name,
@@ -33,6 +35,8 @@ async def command_start_handler(
 
 @router.message(Command("help"))
 async def command_help_handler(message: types.Message) -> None:
+    if not message.from_user:
+        return None
     is_admin = message.from_user.id in settings.ADMINS
     answer = render_message(
         MessageType.help_command,

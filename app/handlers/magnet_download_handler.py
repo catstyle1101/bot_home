@@ -20,7 +20,9 @@ async def magnet_download(
     message: types.Message,
     is_admin: bool,
     downloader: Downloader,
-):
+) -> None:
+    if not message.text:
+        return None
     result = downloader.add_torrent(message.text)
     logger.debug(repr(result))
     if result:

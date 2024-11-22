@@ -90,7 +90,7 @@ if __name__ == "__main__":
         logging_config = yaml.safe_load(file)
     logging.config.dictConfig(logging_config)
     queue_handler = logging.getHandlerByName("queue_handler")
-    if queue_handler:
+    if queue_handler and hasattr(queue_handler, "listener"):
         queue_handler.listener.start()
         atexit.register(queue_handler.listener.stop)
     logger = logging.getLogger(__name__)

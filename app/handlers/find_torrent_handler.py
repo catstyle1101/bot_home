@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Mapping
 
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
@@ -15,6 +16,8 @@ from keyboards import (
     NavigateFindTorrentsCb,
     start_menu_kb,
 )
+from provider.schemas import Torrent
+from torrent_api.data_formatter import TorrentFormatter
 from torrent_api.fetch import make_magnet_link, scrap_torrents
 
 # from transmission_client import TransmissionClient
@@ -24,7 +27,7 @@ router = Router(name=__name__)
 
 
 class TorrentsCache:
-    torrents = None
+    torrents: Mapping[str, Torrent | TorrentFormatter]
     timestamp = 0
 
 
@@ -35,7 +38,7 @@ class FSMFindTorrents(StatesGroup):
 @router.callback_query(
     StartMenuCallbackData.filter(F.action == Action.find),
 )
-async def find_title(callback: types.CallbackQuery, state: FSMContext):
+async def find_title(callback: types.CallbackQuery, state: FSMContext) -> None:
     """
     A callback query handler that handles the 'menu_find' text.
     It sets the FSMFindTorrents.title state and sends a message
@@ -49,11 +52,13 @@ async def find_title(callback: types.CallbackQuery, state: FSMContext):
     """
     await callback.answer()
     await state.set_state(FSMFindTorrents.title)
+    if not isinstance(callback.message, types.Message):
+        return None
     await callback.message.answer("Скинь название торрента")
 
 
 @router.message(FSMFindTorrents.title)
-async def show_torrents(message: types.Message, state: FSMContext):
+async def show_torrents(message: types.Message, state: FSMContext) -> None:
     """
     This function is a message handler for the FSMFindTorrents state.
     It takes in a message and a state context as parameters.
@@ -71,32 +76,36 @@ async def show_torrents(message: types.Message, state: FSMContext):
     await state.update_data(title=message.text)
 
     torrents = await scrap_torrents(query=message.text)
-    if torrents:
-        TorrentsCache.torrents = torrents
-        TorrentsCache.timestamp = datetime.now().timestamp() + 60 * 10
-        answer = render_message(
-            MessageType.format_find_torrent,
-            torrents=[i for i in torrents.values()],
-            is_short=False,
-        )
-        answer_messages = prepare_message(message=answer, delimiter=" ..")
-        for idx, reply_message in enumerate(answer_messages, 1):
-            if idx == len(answer_messages):
-                try:
-                    await message.reply(
-                        reply_message,
-                        reply_markup=torrent_find_kb(
-                            query=message.text,
-                        ),
-                    )
-                except ValueError as e:
-                    logging.error(e)
-                    await message.reply(reply_message)
-            else:
-                await message.reply(reply_message)
-    else:
+    if not torrents:
         answer = render_message(MessageType.nothing_found)
         await message.reply(text=answer)
+        await state.clear()
+        return None
+    TorrentsCache.torrents = torrents
+    TorrentsCache.timestamp = int(datetime.now().timestamp()) + 60 * 10
+    answer = render_message(
+        MessageType.format_find_torrent,
+        torrents=[i for i in torrents.values()],
+        is_short=False,
+    )
+    answer_messages = prepare_message(message=answer, delimiter=" ..")
+    if not message.text:
+        await state.clear()
+        return None
+    for idx, reply_message in enumerate(answer_messages, 1):
+        if idx == len(answer_messages):
+            try:
+                await message.reply(
+                    reply_message,
+                    reply_markup=torrent_find_kb(
+                        query=message.text,
+                    ),
+                )
+            except ValueError as e:
+                logging.error(e)
+                await message.reply(reply_message)
+        else:
+            await message.reply(reply_message)
     await state.clear()
 
 
@@ -111,7 +120,7 @@ async def navigate_find_torrents(
             query=callback_data.query, offset=callback_data.offset
         )
         TorrentsCache.torrents = torrents
-        TorrentsCache.timestamp = datetime.now().timestamp() * 60 * 10
+        TorrentsCache.timestamp = int(datetime.now().timestamp()) * 60 * 10
         if torrents:
             answer = render_message(
                 MessageType.format_find_torrent,
@@ -119,6 +128,8 @@ async def navigate_find_torrents(
                 is_short=False,
             )
             answer_messages = prepare_message(message=answer, delimiter=" ..")
+            if not isinstance(callback_query.message, types.Message):
+                return None
             await callback_query.message.edit_text(
                 text=answer_messages[0],
                 reply_markup=torrent_find_kb(
@@ -127,6 +138,8 @@ async def navigate_find_torrents(
                 ),
             )
     except Exception:
+        if not isinstance(callback_query.message, types.Message):
+            return None
         await callback_query.message.edit_text(
             text=ErrorMessage.api_not_found,
             reply_markup=start_menu_kb(),
@@ -135,15 +148,6 @@ async def navigate_find_torrents(
 
 # @router.message(F.text.startswith("/link_"))
 # async def download_torrent(message: types.Message):
-#     """
-#     Handles the download of a torrent based on a message.
-#
-#     Args:
-#     - message (types.Message): The message object containing the command.
-#
-#     Returns:
-#     - None
-#     """
 #     if (
 #         TorrentsCache.torrents is None
 #         or datetime.now().timestamp() > TorrentsCache.timestamp

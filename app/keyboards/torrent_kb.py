@@ -19,7 +19,7 @@ class TorrentsListKeyboardCallbackData(CallbackData, prefix="del_list_torrents")
 
 
 class TorrentDelConfirmCallbackData(CallbackData, prefix="del_t_conf"):
-    torrent_id: int | str | None
+    torrent_id: int | str
     action: DeleteActionEnum
 
 
@@ -34,8 +34,8 @@ def generate_torrent_keyboard(
 ) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     count_pages = len(torrents) // page_size + 1
-    torrents = list(itertools.batched(torrents, n=page_size))
-    for torrent in torrents[page]:
+    torrents_list = list(itertools.batched(torrents, n=page_size))
+    for torrent in torrents_list[page]:
         builder.button(
             text=f"{torrent.name} {torrent.str_size}",
             callback_data=TorrentsListKeyboardCallbackData(
@@ -69,7 +69,7 @@ def generate_torrent_keyboard(
     return builder.as_markup()
 
 
-def generate_del_torrent_kb(torrent_id: int) -> InlineKeyboardMarkup:
+def generate_del_torrent_kb(torrent_id: int | str) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
 
     builder.row(

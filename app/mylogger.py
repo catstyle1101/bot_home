@@ -1,5 +1,6 @@
 import json
 import logging
+from logging import LogRecord
 from typing import override
 import datetime as dt
 
@@ -14,7 +15,7 @@ class MyJSONFormatter(logging.Formatter):
         message = self._prepare_log_dict(record)
         return json.dumps(message, default=str)
 
-    def _prepare_log_dict(self, record: logging.LogRecord):
+    def _prepare_log_dict(self, record: logging.LogRecord) -> dict[str, str | None]:
         always_fields = {
             "message": record.getMessage(),
             "timestamp": dt.datetime.fromtimestamp(
@@ -53,9 +54,9 @@ class ColorFormatter(logging.Formatter):
         "DEBUG": "\033[34m%s\033[0m",  # Зеленый
     }
 
-    def format(self, record):
+    def format(self, record: LogRecord) -> str:
         s = super().format(record)
         try:
             return self.level_color[record.levelname] % s
-        except Exception:
+        except Exception as e:
             return s

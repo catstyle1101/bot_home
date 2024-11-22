@@ -27,7 +27,8 @@ class Torrent(BaseModel):
     magnet_uri: str = ""
 
     @property
-    def str_size(self):
+    def str_size(self) -> str:
         for name, value in BYTES_WITH_NAMES:
             if self.size > value:
                 return f"{round(self.size / value, ROUND_SIGNS)} {name}"
+        raise ValueError(f"Not enough bytes for {self.name}")

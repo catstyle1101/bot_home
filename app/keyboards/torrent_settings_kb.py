@@ -1,7 +1,7 @@
 from enum import StrEnum, auto
 
 from aiogram.filters.callback_data import CallbackData
-from aiogram.types import InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from config import settings
@@ -17,7 +17,7 @@ class TrackerCb(CallbackData, prefix="list_of_trackers"):
     action: TrackerListAction
 
 
-def torrent_settings_kb(trackers):
+def torrent_settings_kb(trackers: list[str]) -> InlineKeyboardMarkup:
     builder = InlineKeyboardBuilder()
     for tracker in trackers:
         if tracker in settings.FIND_TORRENTS_TRACKERS:

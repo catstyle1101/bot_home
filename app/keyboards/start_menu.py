@@ -1,11 +1,11 @@
-from enum import StrEnum, auto
+from enum import auto, IntEnum
 
 from aiogram.filters.callback_data import CallbackData
 from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-class Action(StrEnum):
+class Action(IntEnum):
     find = auto()
     downloaded_torrents = auto()
 

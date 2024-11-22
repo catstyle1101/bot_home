@@ -1,14 +1,15 @@
 import logging
 import re
+from typing import List, Any, Tuple
 
 from config import settings
-from transmission_rpc import Client
-from transmission_rpc.error import TransmissionError
+from transmission_rpc import Client, Torrent  # type: ignore
+from transmission_rpc.error import TransmissionError  # type: ignore
 
 
 # TODO переписать на протоколы. Этот класс нигде не используется на данный момент.
 class TransmissionClient:
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initializes a new instance of the class.
 
@@ -29,17 +30,17 @@ class TransmissionClient:
 
         self.log = logging.getLogger(__name__)
         self.log.warning("This class deprecated, do not use it")
-        USER = settings.TRANSMISSION_LOGIN
-        PASSWORD = settings.TRANSMISSION_PASSWORD
-        HOST = settings.TRANSMISSION_HOST
+        user = settings.TRANSMISSION.LOGIN
+        password = settings.TRANSMISSION.PASSWORD
+        host = settings.TRANSMISSION.HOST
         try:
-            self.client = Client(host=HOST, port=9091, username=USER, password=PASSWORD)
+            self.client = Client(host=host, port=9091, username=user, password=password)
         except TransmissionError as e:
             self.log.exception(f"Transmission error: {str(e)}")
             raise TransmissionError(f"Transmission error: {str(e)}")
 
     @staticmethod
-    def find_directory(name: str):
+    def find_directory(name: str) -> str:
         """
         Finds the directory corresponding to a given name.
 
@@ -65,7 +66,7 @@ class TransmissionClient:
                 return directories_dict[key]
         return ""
 
-    def get_downloaded_torrents(self):
+    def get_downloaded_torrents(self) -> list[Any] | list[tuple[int, str, str]]:
         """
         Retrieves a list of downloaded torrents from the client.
 
@@ -77,7 +78,7 @@ class TransmissionClient:
             torrents = self.client.get_torrents()
         except Exception as e:
             self.log.exception(f"Exception occured while retrieving torrents: {e}")
-            return
+            return []
         torrents.sort(key=lambda x: x.name)
         result = [
             (
@@ -91,7 +92,7 @@ class TransmissionClient:
         result.sort(key=lambda x: x[1], reverse=False)
         return result
 
-    def get_torrent_name(self, index: str | int):
+    def get_torrent_name(self, index: str | int) -> str:
         """
         Get the name of a torrent by its index.
 
@@ -101,9 +102,9 @@ class TransmissionClient:
         Returns:
             str: The name of the torrent.
         """
-        return self.client.get_torrent(int(index)).name
+        return str(self.client.get_torrent(int(index)).name)
 
-    def del_torrent(self, index: str | int):
+    def del_torrent(self, index: str | int) -> bool:
         """
         Deletes a torrent from the client.
 
@@ -121,7 +122,7 @@ class TransmissionClient:
             return False
         return True
 
-    def add_torrent(self, link: str, name: str | None = None):
+    def add_torrent(self, link: str, name: str = "") -> bool:
         """
         Adds a torrent to the transmission client.
 

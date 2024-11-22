@@ -1,5 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from config import settings
 
@@ -46,7 +46,9 @@ if response.status_code == 200:
     res = session.get(torrent_topic_url, headers=headers)
     if res.status_code == 200:
         soup_1 = BeautifulSoup(res.content, "html.parser")
-        magnet_link = soup_1.find("a", class_="magnet-link").get("href")
+        magnet_link_tag = soup_1.find("a", class_="magnet-link")
+        if isinstance(magnet_link_tag, Tag):
+            magnet_link = magnet_link_tag.get("href")
         ...
 else:
     print(f"Failed to retrieve the page. Status code: {response.status_code}")
