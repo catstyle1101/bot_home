@@ -1,4 +1,6 @@
 from typing import Unpack, TypedDict, NotRequired, TYPE_CHECKING
+# from typing_extensions import TypedDict, Unpack # < Python 3.12
+
 
 from jinja2 import Template
 

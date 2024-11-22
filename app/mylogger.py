@@ -58,5 +58,5 @@ class ColorFormatter(logging.Formatter):
         s = super().format(record)
         try:
             return self.level_color[record.levelname] % s
-        except Exception as e:
+        except Exception:
             return s

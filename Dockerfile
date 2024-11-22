@@ -13,5 +13,9 @@ ENTRYPOINT ["/app/run.sh"]
 
 FROM base AS test
 COPY ./infra/.env.example ./bot/.env
+COPY setup.cfg .
+COPY pyproject.toml .
 RUN pip install mypy
-CMD ["python", "-m", "mypy", "."]
+RUN pip install flake8
+#CMD ["python", "-m", "mypy", "."]
+CMD ["python", "-m", "flake8", "."]

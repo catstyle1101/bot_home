@@ -7,7 +7,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery
 
-from config import settings
 from enums import MessageType, ErrorMessage
 from keyboards import (
     StartMenuCallbackData,
@@ -16,18 +15,17 @@ from keyboards import (
     NavigateFindTorrentsCb,
     start_menu_kb,
 )
-from provider.schemas import Torrent
+from provider.protocols import Downloader
 from torrent_api.data_formatter import TorrentFormatter
 from torrent_api.fetch import make_magnet_link, scrap_torrents
 
-# from transmission_client import TransmissionClient
 from utils import render_message, prepare_message
 
 router = Router(name=__name__)
 
 
 class TorrentsCache:
-    torrents: Mapping[str, Torrent | TorrentFormatter]
+    torrents: Mapping[str, TorrentFormatter]
     timestamp = 0
 
 
@@ -146,31 +144,39 @@ async def navigate_find_torrents(
         )
 
 
-# @router.message(F.text.startswith("/link_"))
-# async def download_torrent(message: types.Message):
-#     if (
-#         TorrentsCache.torrents is None
-#         or datetime.now().timestamp() > TorrentsCache.timestamp
-#     ):
-#         TorrentsCache.timestamp = datetime.now().timestamp()
-#         await message.answer("Сделай поиск заново, ссылки устарели")
-#         return
-#
-#     magnet_key = message.text.split("_")[1]
-#     torrent = await make_magnet_link(TorrentsCache.torrents.get(magnet_key))
-#     if torrent is None:
-#         await message.answer("Сделай поиск заново, ссылки устарели")
-#
-#     if torrent.magnet_link.startswith("magnet"):
-#         if message.from_user.id in settings.ADMINS:
-#             client = TransmissionClient()
-#             client.add_torrent(torrent.magnet_link)
-#             await message.answer("Закачка добавлена")
-#
-#         answer = render_message(
-#             MessageType.format_find_torrent,
-#             torrents=[torrent],
-#             is_short=True,
-#         )
-#         await message.answer(text=answer)
-#         await message.answer(torrent.magnet_link)
+@router.message(F.text.startswith("/link_"))
+async def download_torrent(
+    message: types.Message, is_admin: bool, downloader: Downloader
+) -> None:
+    if (
+        TorrentsCache.torrents is None
+        or datetime.now().timestamp() > TorrentsCache.timestamp
+    ):
+        TorrentsCache.timestamp = int(datetime.now().timestamp())
+        await message.answer("Сделай поиск заново, ссылки устарели")
+        return
+
+    if not message.text:
+        return None
+
+    magnet_key = message.text.split("_")[1]
+    cached_torrent = TorrentsCache.torrents.get(magnet_key)
+    if cached_torrent is None:
+        await message.answer("Сделай поиск заново, ссылки устарели")
+        return
+    torrent = await make_magnet_link(cached_torrent)
+    if torrent is None:
+        await message.answer("Сделай поиск заново, ссылки устарели")
+
+    if torrent.magnet_link.startswith("magnet"):
+        if is_admin:
+            downloader.add_torrent(torrent.magnet_link)
+            await message.answer("Закачка добавлена")
+
+        answer = render_message(
+            MessageType.format_find_torrent,
+            torrents=[torrent],
+            is_short=True,
+        )
+        await message.answer(text=answer)
+        await message.answer(torrent.magnet_link)
