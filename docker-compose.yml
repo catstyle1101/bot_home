@@ -1,9 +1,4 @@
 services:
-  test:
-    build:
-      context: ../
-      target: test
-
   ngrok:
     image: ngrok/ngrok:latest
     restart: unless-stopped
@@ -24,4 +19,3 @@ services:
       - .env
     depends_on:
       - ngrok
-      - test
