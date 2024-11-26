@@ -17,7 +17,6 @@ services:
     restart: on-failure
     stop_signal: SIGINT
     depends_on:
-      - test
       - ngrok
     ports:
       - "8080:8080"

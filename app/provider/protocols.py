@@ -19,9 +19,9 @@ class Downloader(Protocol):
     ) -> bool: ...
 
 
-class Cache(Protocol):
-    _torrents: list[Torrent] = []
-    _expires_at: int | float | None = None
+class TorrentsCache(Protocol):
+    _torrents: list[Torrent]
+    _expires_at: int | None
 
     def get_torrents(self) -> list[Torrent]: ...
 

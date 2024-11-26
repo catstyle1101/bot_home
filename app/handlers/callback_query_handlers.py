@@ -13,7 +13,7 @@ from keyboards import (
     TorrentsListKeyboardCallbackData,
     DeleteActionEnum,
 )
-from provider.protocols import Downloader, Cache
+from provider.protocols import Downloader, TorrentsCache
 from utils import render_message
 
 router = Router(name=__name__)
@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 async def downloaded_torrents(
     callback_query: types.CallbackQuery,
     downloader: Downloader,
-    cache: Cache,
+    cache: TorrentsCache,
 ) -> None:
     await callback_query.answer()
     torrents = cache.get_torrents()
@@ -56,7 +56,7 @@ async def navigate_torrents(
     callback_query: types.CallbackQuery,
     callback_data: NavigateTorrentsListCallbackData,
     downloader: Downloader,
-    cache: Cache,
+    cache: TorrentsCache,
 ) -> None:
     await callback_query.answer()
     torrents = cache.get_torrents()
@@ -100,7 +100,7 @@ async def delete_torrent(
     callback_query: types.CallbackQuery,
     callback_data: TorrentDelConfirmCallbackData,
     downloader: Downloader,
-    cache: Cache,
+    cache: TorrentsCache,
 ) -> None:
     torrent = downloader.get_torrent_by_id(callback_data.torrent_id)
     is_deleted = downloader.delete_torrent_by_id(callback_data.torrent_id)
@@ -127,7 +127,7 @@ async def no_delete_torrent(
     callback_query: types.CallbackQuery,
     callback_data: TorrentDelConfirmCallbackData,
     downloader: Downloader,
-    cache: Cache,
+    cache: TorrentsCache,
 ) -> None:
     await callback_query.answer()
     torrent = downloader.get_torrent_by_id(callback_data.torrent_id)

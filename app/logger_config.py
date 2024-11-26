@@ -1,8 +1,14 @@
+import atexit
 import json
 import logging
+import logging.config
 from logging import LogRecord
 from typing import override
 import datetime as dt
+
+import yaml
+
+from config import settings
 
 
 class MyJSONFormatter(logging.Formatter):
@@ -60,3 +66,19 @@ class ColorFormatter(logging.Formatter):
             return self.level_color[record.levelname] % s
         except Exception:
             return s
+
+
+def configure_logger() -> None:
+    with open("logging_config.yml", "r", encoding="utf-8") as file:
+        logging_config = yaml.safe_load(file)
+    logging.config.dictConfig(logging_config)
+    logger = logging.getLogger(__name__)
+    if settings.DEBUG:
+        for handler in logger.handlers:
+            handler.setLevel(logging.DEBUG)
+        logging.basicConfig(level=logging.DEBUG)
+    queue_handler = logging.getHandlerByName("queue_handler")
+    if queue_handler and hasattr(queue_handler, "listener"):
+        queue_handler.listener.start()
+        atexit.register(queue_handler.listener.stop)
+    logger.info("Starting...")

@@ -6,12 +6,12 @@ from .schemas import Torrent
 SECONDS_IN_MINUTE: Final[int] = 60
 
 
-class Cache:
+class MemCache:
     _torrents: list[Torrent] = []
     _expires_at: int | float | None = None
     _instance = None
 
-    def __new__(cls) -> "Cache":
+    def __new__(cls) -> "MemCache":
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
         return cls._instance
@@ -26,7 +26,7 @@ class Cache:
         return self._torrents
 
     def set_torrents(self, torrents: list[Torrent]) -> None:
-        self._expires_at = (
+        self._expires_at = int(
             datetime.now().timestamp() + self.expire_minutes * SECONDS_IN_MINUTE
         )
         self._torrents = torrents
