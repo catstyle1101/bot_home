@@ -11,11 +11,11 @@ from .find_torrent_settings_handler import router as find_torrent_settings_route
 router = Router(name=__name__)
 
 router.include_routers(
+    commands_router,
     find_torrent_router,
     callback_router,
     find_torrent_settings_router,
     magnet_download_router,
-    commands_router,
 )
 # This must be the last one!
 router.include_router(common_router)
