@@ -1,9 +1,15 @@
+import asyncio
+import logging
 from typing import Any
 
 import aiohttp
+from aiohttp import ClientResponseError, ClientError
 
 from config import settings
 from torrent_api.schemas import TorrentApi
+
+
+logger = logging.getLogger(__name__)
 
 
 def session_maker() -> aiohttp.ClientSession:
@@ -64,9 +70,23 @@ async def fetch_url(
         "full_match": full_match,
         "token": token,
     }
-    async with session_maker() as session:
-        async with session.post(url, json=data, ssl=False) as response:
-            return await response.json()
+    try:
+        async with session_maker() as session:
+            async with session.post(url, json=data, ssl=False) as response:
+                response.raise_for_status()  # Raise exception for HTTP error codes
+                return await response.json()
+    except ClientResponseError as e:
+        logger.error(f"HTTP Error {e.status}: {e.message}")
+        return {"error": f"HTTP Error {e.status}: {e.message}"}
+    except ClientError as e:
+        logger.error(f"Client error: {str(e)}")
+        return {"error": f"Client error: {str(e)}"}
+    except asyncio.TimeoutError:
+        logger.error("Request timed out")
+        return {"error": "Request timed out"}
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {str(e)}")
+        return {"error": f"Unexpected error: {str(e)}"}
 
 
 async def scrap_torrents(
@@ -83,17 +103,36 @@ async def scrap_torrents(
     - dict[str, TorrentApi]: A dictionary containing the magnet
         keys and their corresponding formatted torrent data.
     """
-    raw_data = await fetch_url("/search", **kwargs, token=token)
-    data = {i["magnet_key"]: TorrentApi.model_validate(i) for i in raw_data["data"]}
-    return data
+    try:
+        raw_data = await fetch_url("/search", **kwargs, token=token)
+        if "error" in raw_data:
+            raise ValueError(raw_data["error"])
+        return {
+            i["magnet_key"]: TorrentApi.model_validate(i)
+            for i in raw_data.get("data", [])
+        }
+    except ValueError as e:
+        logger.error(f"Data error: {str(e)}")
+        return {}
+    except Exception as e:
+        logger.error(f"Unexpected error in scrap_torrents: {str(e)}")
+        return {}
 
 
 async def list_of_trackers() -> list[str]:
     trackers = []
-    async with session_maker() as session:
-        async with session.get("/trackers", ssl=False) as response:
-            trackers = (await response.json()).get("data")
-    return trackers
+    try:
+        async with session_maker() as session:
+            async with session.get("/trackers", ssl=False) as response:
+                response.raise_for_status()
+                trackers = (await response.json()).get("data", [])
+                return trackers
+    except ClientError as e:
+        logger.error(f"Error fetching trackers: {str(e)}")
+        return []
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        return []
 
 
 async def make_magnet_link(torrent: TorrentApi) -> TorrentApi:
@@ -106,9 +145,23 @@ async def make_magnet_link(torrent: TorrentApi) -> TorrentApi:
     Returns:
     - TorrentApi: The torrent object with the magnet link added.
     """
-    async with session_maker() as session:
-        async with session.get(f"/magnet/{torrent.magnet_key}", ssl=False) as response:
-            res = await response.json()
-            if res["status_code"] == 200:
-                torrent.magnet_link = res["data"]["magnet_link"]
+    try:
+        async with session_maker() as session:
+            async with session.get(
+                f"/magnet/{torrent.magnet_key}",
+                ssl=False,
+            ) as response:
+                response.raise_for_status()
+                res = await response.json()
+                if res.get("status_code") == 200:
+                    torrent.magnet_link = res["data"]["magnet_link"]
+                else:
+                    logger.error(
+                        "Failed to fetch magnet link: "
+                        f"{res.get('message', 'Unknown error')}"
+                    )
+    except ClientError as e:
+        logger.error(f"Error fetching magnet link: {str(e)}")
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
     return torrent
