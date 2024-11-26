@@ -7,13 +7,13 @@ from jinja2 import Template
 
 if TYPE_CHECKING:
     from provider.schemas import Torrent
-    from torrent_api.data_formatter import TorrentFormatter
+    from torrent_api.schemas import TorrentApi
 
 
 class Kw(TypedDict):
     is_admin: NotRequired[bool]
     result: NotRequired[bool]
-    torrents: NotRequired[list["TorrentFormatter"]]
+    torrents: NotRequired[list["TorrentApi"]]
     is_short: NotRequired[bool]
     name: NotRequired[str]
     torrent_name: NotRequired[str]

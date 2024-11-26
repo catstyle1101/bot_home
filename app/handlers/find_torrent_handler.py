@@ -16,7 +16,7 @@ from keyboards import (
     start_menu_kb,
 )
 from provider.protocols import Downloader
-from torrent_api.data_formatter import TorrentFormatter
+from torrent_api.schemas import TorrentApi
 from torrent_api.fetch import make_magnet_link, scrap_torrents
 
 from utils import render_message, prepare_message
@@ -25,7 +25,7 @@ router = Router(name=__name__)
 
 
 class TorrentsCache:
-    torrents: Mapping[str, TorrentFormatter]
+    torrents: Mapping[str, TorrentApi]
     timestamp = 0
 
 

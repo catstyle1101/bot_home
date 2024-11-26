@@ -3,7 +3,7 @@ from typing import Any
 import aiohttp
 
 from config import settings
-from torrent_api.data_formatter import format_data, TorrentFormatter
+from torrent_api.schemas import TorrentApi
 
 
 def session_maker() -> aiohttp.ClientSession:
@@ -72,7 +72,7 @@ async def fetch_url(
 async def scrap_torrents(
     token: str = settings.FREEDOMIST_TOKEN,
     **kwargs: Any,
-) -> dict[str, TorrentFormatter]:
+) -> dict[str, TorrentApi]:
     """
     An asynchronous function that scrapes torrents based on a given query.
 
@@ -80,11 +80,11 @@ async def scrap_torrents(
     - query (str): The query string used to search for torrents.
 
     Returns:
-    - dict[str, TorrentFormatter]: A dictionary containing the magnet
+    - dict[str, TorrentApi]: A dictionary containing the magnet
         keys and their corresponding formatted torrent data.
     """
     raw_data = await fetch_url("/search", **kwargs, token=token)
-    data = {i["magnet_key"]: format_data(i) for i in raw_data["data"]}
+    data = {i["magnet_key"]: TorrentApi.model_validate(i) for i in raw_data["data"]}
     return data
 
 
@@ -96,15 +96,15 @@ async def list_of_trackers() -> list[str]:
     return trackers
 
 
-async def make_magnet_link(torrent: TorrentFormatter) -> TorrentFormatter:
+async def make_magnet_link(torrent: TorrentApi) -> TorrentApi:
     """
     Asynchronously creates a magnet link for a given torrent.
 
     Args:
-    - torrent (TorrentFormatter): The torrent for which to create a magnet link.
+    - torrent (TorrentApi): The torrent for which to create a magnet link.
 
     Returns:
-    - TorrentFormatter: The torrent object with the magnet link added.
+    - TorrentApi: The torrent object with the magnet link added.
     """
     async with session_maker() as session:
         async with session.get(f"/magnet/{torrent.magnet_key}", ssl=False) as response:
