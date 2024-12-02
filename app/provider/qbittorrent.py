@@ -16,7 +16,14 @@ class QBittorrent:
         except Exception as e:
             raise e
 
+    def login(self) -> None:
+        try:
+            self.client.login(settings.QBITTORRENT.LOGIN, settings.QBITTORRENT.PASSWORD)
+        except Exception as e:
+            raise e
+
     def get_downloaded_torrents(self) -> list[Torrent]:
+        self.login()
         torrents = self.client.torrents()
         logger.debug(torrents)
         torrents = [
@@ -33,6 +40,7 @@ class QBittorrent:
         return sorted(torrents, key=lambda t: t.name)
 
     def get_torrent_by_id(self, torrent_id: str) -> Torrent | None:
+        self.login()
         torrents = self.get_downloaded_torrents()
         for torrent in torrents:
             if torrent.id == torrent_id:
@@ -44,6 +52,7 @@ class QBittorrent:
         magnet_link: str,
         **kwargs: dict[str, str],
     ) -> bool:
+        self.login()
         magnet_link = magnet_link.strip()
         if "," in magnet_link:
             magnet_links = magnet_link.split(",")
@@ -54,4 +63,5 @@ class QBittorrent:
         return str(self.client.download_from_link(magnet_links, **kwargs)) == "Ok."
 
     def delete_torrent_by_id(self, torrent_id: str) -> None:
+        self.login()
         self.client.delete_permanently(torrent_id)
