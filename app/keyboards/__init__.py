@@ -9,8 +9,12 @@ from .torrent_kb import (
 )
 from .torrent_find_kb import torrent_find_kb, NavigateFindTorrentsCb
 from .torrent_settings_kb import torrent_settings_kb, TrackerCb, TrackerListAction
+from .torrent_group_kb import torrent_group_kb, TorrentsGroup, TorrentsGroupCallbackData
 
 __all__ = (
+    "TorrentsGroupCallbackData",
+    "TorrentsGroup",
+    "torrent_group_kb",
     "start_menu_kb",
     "Action",
     "StartMenuCallbackData",

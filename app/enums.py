@@ -10,6 +10,7 @@ class MessageType(StrEnum):
     download_magnet = "messages/download_magnet.j2"
     format_find_torrent = "messages/format_find_torrent.j2"
     nothing_found = "messages/nothing_found.j2"
+    select_group = "messages/select_group.j2"
 
 
 class ErrorMessage(StrEnum):
