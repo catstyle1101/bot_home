@@ -28,28 +28,4 @@ def torrent_group_kb() -> InlineKeyboardMarkup:
                 ).pack(),
             )
         )
-    # builder.row(
-    #     InlineKeyboardButton(
-    #         text=TorrentsGroup.series,
-    #         callback_data=TorrentsGroupCallbackData(
-    #             group=TorrentsGroup.series,
-    #         ).pack(),
-    #     )
-    # )
-    # builder.row(
-    #     InlineKeyboardButton(
-    #         text=TorrentsGroup.children,
-    #         callback_data=TorrentsGroupCallbackData(
-    #             group=TorrentsGroup.children,
-    #         ).pack(),
-    #     )
-    # )
-    # builder.row(
-    #     InlineKeyboardButton(
-    #         text=TorrentsGroup.cancel,
-    #         callback_data=TorrentsGroupCallbackData(
-    #             group=TorrentsGroup.cancel,
-    #         ).pack(),
-    #     )
-    # )
     return builder.as_markup()

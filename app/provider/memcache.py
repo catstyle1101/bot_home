@@ -9,7 +9,7 @@ SECONDS_IN_MINUTE: Final[int] = 60
 class MemCache:
     _torrents: list[Torrent] = []
     _expires_at: int | float | None = None
-    _instance = None
+    _instance: "MemCache | None" = None
 
     def __new__(cls) -> "MemCache":
         if not isinstance(cls._instance, cls):

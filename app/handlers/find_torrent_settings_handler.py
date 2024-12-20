@@ -20,7 +20,7 @@ HOURS = 60 * 60
 class TrackersCache:
     _trackers: list[str] | None = []
     _expires_at: int | float | None = None
-    _instance = None
+    _instance: "TrackersCache | None" = None
 
     def __new__(cls) -> "TrackersCache":
         if not isinstance(cls._instance, cls):

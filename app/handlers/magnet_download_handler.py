@@ -81,7 +81,7 @@ async def magnet_download_group(
     await callback_query.answer(text=reply_message)
     await state.clear()
     start_message = render_message(
-        MessageType.start_menu,
+        MessageType.download_magnet,
         name=callback_query.from_user.full_name,
         is_admin=True,
     )
