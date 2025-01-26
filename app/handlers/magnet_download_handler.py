@@ -73,20 +73,15 @@ async def magnet_download_group(
         magnet_link=str(magnet_link),
         category=callback_data.group,
     )
-    logger.debug("%r", result)
+    logger.debug("magnet added successfully: %r", result)
     reply_message = render_message(
         MessageType.download_magnet,
         result=result,
-    )
-    await callback_query.answer(text=reply_message)
-    await state.clear()
-    start_message = render_message(
-        MessageType.download_magnet,
-        name=callback_query.from_user.full_name,
         is_admin=True,
     )
+    await state.clear()
     if callback_query.message and isinstance(callback_query.message, types.Message):
         await callback_query.message.edit_text(
-            text=start_message,
+            text=reply_message,
             reply_markup=start_menu_kb(),
         )
