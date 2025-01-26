@@ -62,7 +62,12 @@ class QBittorrent:
             magnet_links = [magnet_link]
         return str(self.client.download_from_link(magnet_links, **kwargs)) == "Ok."
 
-    def delete_torrent_by_id(self, torrent_id: str) -> None:
-        self.login()
-        delete_result = self.client.delete_permanently(torrent_id)
-        logger.debug("delete_result = %s", delete_result)
+    def delete_torrent_by_id(self, torrent_id: str) -> bool:
+        try:
+            self.login()
+            delete_result = self.client.delete_permanently(torrent_id)
+            logger.debug("delete_result = %s", delete_result)
+            return True
+        except Exception as e:
+            logger.error(e)
+            return False
