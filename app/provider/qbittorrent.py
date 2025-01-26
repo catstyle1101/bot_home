@@ -25,7 +25,6 @@ class QBittorrent:
     def get_downloaded_torrents(self) -> list[Torrent]:
         self.login()
         torrents = self.client.torrents()
-        logger.debug(torrents)
         torrents = [
             Torrent(
                 id=(i["infohash_v1"] or i["infohash_v2"]),
@@ -65,4 +64,5 @@ class QBittorrent:
 
     def delete_torrent_by_id(self, torrent_id: str) -> None:
         self.login()
-        self.client.delete_permanently(torrent_id)
+        delete_result = self.client.delete_permanently(torrent_id)
+        logger.debug("delete_result = %s", delete_result)
