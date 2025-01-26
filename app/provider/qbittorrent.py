@@ -37,6 +37,7 @@ class QBittorrent:
             )
             for i in torrents
         ]
+        logger.info("List of parsed downloaded torrents: %s", torrents)
         return sorted(torrents, key=lambda t: t.name)
 
     def get_torrent_by_id(self, torrent_id: str) -> Torrent | None:
