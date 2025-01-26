@@ -106,18 +106,12 @@ async def delete_torrent(
     torrent = downloader.get_torrent_by_id(callback_data.torrent_id)
     logger.debug("Delete torrent handler: found torrent = %s", torrent)
     is_deleted = downloader.delete_torrent_by_id(callback_data.torrent_id)
-    if torrent:
-        message = render_message(
-            MessageType.confirm_delete_message,
-            torrent_name=torrent.name,
-            is_deleted=is_deleted,
-        )
-    else:
-        message = render_message(
-            MessageType.confirm_delete_message,
-            torrent_name=callback_data.torrent_id,
-            is_deleted=is_deleted,
-        )
+    logger.debug("Delete torrent handler: delete_result = %s", is_deleted)
+    message = render_message(
+        MessageType.confirm_delete_message,
+        torrent=torrent,
+        is_deleted=is_deleted,
+    )
     await callback_query.answer(text=message, show_alert=True)
     torrents = downloader.get_downloaded_torrents()
     cache.set_torrents(torrents)
