@@ -12,6 +12,7 @@ search_url = "https://rutracker.org/forum/tracker.php?nm={search_query}".format(
 topic_url = "https://rutracker.org/forum/{topic_id}"
 
 # Your login credentials
+
 credentials = {
     "login_username": settings.RUTRACKER.LOGIN,
     "login_password": settings.RUTRACKER.PASSWORD,
