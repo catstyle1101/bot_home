@@ -16,7 +16,6 @@
 - Скачать файл [docker-compose.yml](docker-compose.yml) из корня проекта
 - Запустить `docker compose up`
 
-
 ### Технологии:
 - Aiogram 3
 - Beautifulsoup
